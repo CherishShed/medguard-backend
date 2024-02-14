@@ -1,12 +1,11 @@
 {
-	"name": "medguard-backend",
+	"name": "wordle-backend",
 	"version": "1.0.0",
-	"description": "TypeScript Rest API with Express.js, MongoDB",
+	"description": "TypeScript Rest API with Express.js, , MongoDB",
 	"main": "index.ts",
 	"scripts": {
 		"build": "npx tsc",
-		"start2": "node dist/index.js",
-		"start": "node index.js",
+		"start": "nodemon src/index.ts",
 		"dev": "nodemon src/index.ts",
 		"lint": "eslint src/**/*.ts",
 		"format": "eslint src/**/*.ts --fix"
