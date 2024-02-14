@@ -3,7 +3,7 @@ import app from './Middlewares/expressMiddeware'
 import { connectToDatabase } from './Model/database'
 import router from './Router/router'
 
-app.use('/api', router)
+app.use('/', router)
 const startServer = async () => {
   await connectToDatabase()
   app.listen(8081, () => {
