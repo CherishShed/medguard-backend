@@ -4,7 +4,7 @@ import patientController from '../Controllers/patientController'
 const router = express.Router()
 
 router.get('/', (req, res) => {
-  req.res.status(200).json({ message: 'Good' })
+  res.status(200).json({ message: 'Good' })
 })
 
 router.get('/patient', patientController.getPatientInfo)
