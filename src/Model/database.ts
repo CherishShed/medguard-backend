@@ -3,7 +3,7 @@ import 'dotenv/config'
 
 export const connectToDatabase = async () => {
   mongoose
-    .connect(process.env.CONNECTION_STRING!, {
+    .connect(process.env.CONNECTION_STRING! as string, {
       dbName: 'MedGuard',
     })
     .then(() => {
@@ -18,7 +18,7 @@ mongoose.connection.on('error', err => {
     `An error occurred connecting to database: ${err},\n...reconnecting`
   )
   mongoose
-    .connect(process.env.CONNECTION_STRING!, {
+    .connect(process.env.CONNECTION_STRING! as string, {
       dbName: 'MedGuard',
     })
     .then(() => {
