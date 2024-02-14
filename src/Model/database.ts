@@ -1,6 +1,6 @@
 import mongoose, { Date, Document } from 'mongoose'
 import 'dotenv/config'
-
+mongoose.set('strictQuery', true)
 export const connectToDatabase = async () => {
   mongoose
     .connect(process.env.CONNECTION_STRING! as string, {
