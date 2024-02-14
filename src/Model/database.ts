@@ -67,8 +67,8 @@ const medicationSchema = new mongoose.Schema<IMedication>(
     afternoon: { type: { amount: Number, time: String } },
     night: { type: { amount: Number, time: String } },
     type: { type: String },
-    start_date: { type: Date, default: Date.now().toString() },
-    end_date: { type: Date, default: Date.now().toString() },
+    start_date: { type: String, default: Date.now().toString() },
+    end_date: { type: String, default: Date.now().toString() },
   },
   { timestamps: true }
 )
