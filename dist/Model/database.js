@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Patient = exports.connectToDatabase = void 0;
+exports.HealthWorker = exports.Patient = exports.connectToDatabase = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 require("dotenv/config");
 mongoose_1.default.set('strictQuery', true);
@@ -41,6 +41,20 @@ mongoose_1.default.connection.on('error', err => {
         .catch(err => {
         console.log(`An error occurred connecting to database ${err}`);
     });
+});
+const employeeSchema = new mongoose_1.default.Schema({
+    employeeNumber: { type: String },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    dateOfBirth: { type: String, required: true },
+    gender: { type: String, required: true },
+    post: { type: String },
+    patientUnderCare: [
+        {
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: 'Patient',
+        },
+    ],
 });
 const medicationSchema = new mongoose_1.default.Schema({
     name: { type: String },
@@ -72,3 +86,4 @@ const userSchema = new mongoose_1.default.Schema({
     vitals: [vitalSchema],
 }, { timestamps: true });
 exports.Patient = mongoose_1.default.model('Patient', userSchema);
+exports.HealthWorker = mongoose_1.default.model('HealthWorker', userSchema);
