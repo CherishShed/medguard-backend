@@ -8,5 +8,5 @@ router.get('/', (req, res) => {
 })
 
 router.get('/patient', patientController.getPatientInfo)
-
+router.post('/patient/vitals', patientController.addVitals)
 export default router

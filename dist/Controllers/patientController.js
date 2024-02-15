@@ -38,5 +38,30 @@ const patientController = {
             return res.status(500).json({ error: error, message: 'An error occured' });
         }
     }),
+    addVitals: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const { hospitalNumber, blood_pressure, heart_beat, blood_oxygen } = req.query;
+        try {
+            const foundPatient = yield database_1.Patient.findOne({
+                hospitalNumber: hospitalNumber,
+            });
+            if (foundPatient) {
+                foundPatient.vitals.push({
+                    blood_oxygen: parseInt(blood_oxygen),
+                    blood_pressure: parseInt(blood_pressure),
+                    heart_beat: parseInt(heart_beat),
+                });
+                foundPatient.save();
+                return res.status(200).json({ Success: true, message: 'Success' });
+            }
+            else {
+                return res
+                    .status(404)
+                    .json({ patient: null, message: 'Patient does not exist' });
+            }
+        }
+        catch (error) {
+            return res.status(500).json({ error: error, message: 'An error occured' });
+        }
+    }),
 };
 exports.default = patientController;

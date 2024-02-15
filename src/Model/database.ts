@@ -1,7 +1,6 @@
 import mongoose, { Date, Document } from 'mongoose'
 import 'dotenv/config'
 mongoose.set('strictQuery', true)
-console.log(process.env.CONNECTION_STRING)
 export const connectToDatabase = async () => {
   mongoose
     .connect(process.env.CONNECTION_STRING! as string, {
@@ -44,12 +43,12 @@ export interface patientType extends Document {
   medications: IMedication[]
   vitals: IVital[]
 }
-interface IVital extends Document {
+interface IVital {
   blood_pressure: number
   heart_beat: number
   blood_oxygen: number
 }
-interface IMedication extends Document {
+interface IMedication {
   name: string
   instructions: string
   morning: { amount: number; time: string }

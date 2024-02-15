@@ -11,4 +11,5 @@ router.get('/', (req, res) => {
     res.status(200).json({ message: 'Good' });
 });
 router.get('/patient', patientController_1.default.getPatientInfo);
+router.post('/patient/vitals', patientController_1.default.addVitals);
 exports.default = router;
