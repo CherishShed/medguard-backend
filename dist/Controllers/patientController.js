@@ -63,5 +63,26 @@ const patientController = {
             return res.status(500).json({ error: error, message: 'An error occured' });
         }
     }),
+    getMedications: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const { hospitalNumber } = req.query;
+        try {
+            const foundPatient = yield database_1.Patient.findOne({
+                hospitalNumber: hospitalNumber,
+            }, { medications: 1 });
+            if (foundPatient) {
+                return res
+                    .status(200)
+                    .json({ medication: foundPatient.medications, message: 'Success' });
+            }
+            else {
+                return res
+                    .status(404)
+                    .json({ patient: null, message: 'Patient does not exist' });
+            }
+        }
+        catch (error) {
+            return res.status(500).json({ error: error, message: 'An error occured' });
+        }
+    }),
 };
 exports.default = patientController;

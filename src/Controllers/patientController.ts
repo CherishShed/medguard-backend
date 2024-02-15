@@ -54,6 +54,28 @@ const patientController = {
       return res.status(500).json({ error: error, message: 'An error occured' })
     }
   },
+  getMedications: async (req: Request, res: Response) => {
+    const { hospitalNumber } = req.query
+    try {
+      const foundPatient = await Patient.findOne(
+        {
+          hospitalNumber: hospitalNumber,
+        },
+        { medications: 1 }
+      )
+      if (foundPatient) {
+        return res
+          .status(200)
+          .json({ medication: foundPatient.medications, message: 'Success' })
+      } else {
+        return res
+          .status(404)
+          .json({ patient: null, message: 'Patient does not exist' })
+      }
+    } catch (error) {
+      return res.status(500).json({ error: error, message: 'An error occured' })
+    }
+  },
 }
 
 export default patientController
