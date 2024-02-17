@@ -58,8 +58,9 @@ interface IMedication {
   start_date: Date
   end_date: Date
 }
-export interface adminType extends Document {
+export interface EmployeeType extends Document {
   employeeNumber: string
+  clerkId: string
   firstName: string
   lastName: string
   dateOfBirth: string
@@ -68,8 +69,9 @@ export interface adminType extends Document {
   patientUnderCare: string[]
 }
 
-const employeeSchema = new mongoose.Schema<adminType>({
+const employeeSchema = new mongoose.Schema<EmployeeType>({
   employeeNumber: { type: String },
+  clerkId: { type: String, required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   dateOfBirth: { type: String, required: true },
@@ -124,7 +126,7 @@ const userSchema = new mongoose.Schema<patientType>(
 )
 
 export const Patient = mongoose.model<patientType>('Patient', userSchema)
-export const HealthWorker = mongoose.model<patientType>(
+export const HealthWorker = mongoose.model<EmployeeType>(
   'HealthWorker',
-  userSchema
+  employeeSchema
 )
