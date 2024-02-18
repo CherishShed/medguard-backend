@@ -68,7 +68,7 @@ const medicationSchema = new mongoose_1.default.Schema({
     end_date: { type: String, default: Date.now().toString() },
 }, { timestamps: true });
 const vitalSchema = new mongoose_1.default.Schema({
-    blood_pressure: { type: Number },
+    blood_pressure: { type: String },
     heart_beat: { type: Number },
     blood_oxygen: { type: Number },
 }, { timestamps: true });

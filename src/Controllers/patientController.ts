@@ -40,7 +40,7 @@ const patientController = {
       if (foundPatient) {
         foundPatient.vitals.push({
           blood_oxygen: parseInt(blood_oxygen as string),
-          blood_pressure: parseInt(blood_pressure as string),
+          blood_pressure: blood_pressure as string,
           heart_beat: parseInt(heart_beat as string),
         })
         foundPatient.save()

@@ -44,7 +44,7 @@ export interface patientType extends Document {
   vitals: IVital[]
 }
 interface IVital {
-  blood_pressure: number
+  blood_pressure: string
   heart_beat: number
   blood_oxygen: number
 }
@@ -101,7 +101,7 @@ const medicationSchema = new mongoose.Schema<IMedication>(
 
 const vitalSchema = new mongoose.Schema<IVital>(
   {
-    blood_pressure: { type: Number },
+    blood_pressure: { type: String },
     heart_beat: { type: Number },
     blood_oxygen: { type: Number },
   },

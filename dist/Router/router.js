@@ -15,5 +15,6 @@ router.get('/patient', patientController_1.default.getPatientInfo);
 router.post('/patient/vitals', patientController_1.default.addVitals);
 router.get('/medication', patientController_1.default.getMedications);
 router.get('/healthworker/patients', adminController_1.default.getAllPatients);
+router.get('/healthworker/dashboardStatistics', adminController_1.default.dashBoardStatistics);
 router.post('/healthworker/linkClerk', adminController_1.default.linkClerkId);
 exports.default = router;
