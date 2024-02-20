@@ -15,6 +15,7 @@ router.get('/', (req, res) => {
     res.status(200).json({ message: 'Good' });
 });
 router.post('/healthworker/login', authController_1.default.loginUser);
+router.post('/healthworker/changepassword', authController_1.default.changePassword);
 router.get('/patient', patientController_1.default.getPatientInfo);
 router.post('/patient/vitals', patientController_1.default.addVitals);
 router.get('/medication', patientController_1.default.getMedications);

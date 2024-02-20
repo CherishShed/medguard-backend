@@ -12,7 +12,7 @@ router.get('/', (req, res) => {
 })
 
 router.post('/healthworker/login', authController.loginUser)
-// router.post('/healthworker/signup', authController.registerUser)
+router.post('/healthworker/changepassword', authController.changePassword)
 router.get('/patient', patientController.getPatientInfo)
 router.post('/patient/vitals', patientController.addVitals)
 router.get('/medication', patientController.getMedications)
