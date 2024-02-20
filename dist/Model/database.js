@@ -51,6 +51,7 @@ const employeeSchema = new mongoose_1.default.Schema({
     phoneNumber: { type: String, required: true },
     gender: { type: String, required: true },
     post: { type: String },
+    changedPassword: { type: Boolean, required: true },
     patientUnderCare: [
         {
             type: mongoose_1.default.Schema.Types.ObjectId,

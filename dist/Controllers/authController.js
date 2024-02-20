@@ -50,6 +50,7 @@ const authController = {
                     gender: user.gender,
                     dateOfBirth: user.dateOfBirth,
                     phoneNumber: user.phoneNumber,
+                    changedPassword: user.changedPassword,
                 },
                 accessToken,
             });
@@ -62,12 +63,44 @@ const authController = {
             }
         }
     }),
+    changePassword: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const { employeeNumber, newPassword, oldPassword } = req.body;
+        const hashedPassword = yield (0, bcrypt_1.hash)(newPassword, 10);
+        try {
+            const existingUser = yield database_1.HealthWorker.findOne({
+                employeeNumber: employeeNumber,
+            }, { employeeNumber: 1, changedPassword: 1, password: 1 });
+            if (existingUser) {
+                const match = yield (0, bcrypt_1.compare)(oldPassword, existingUser.password);
+                if (!match) {
+                    return res
+                        .status(401)
+                        .json({ auth: false, message: 'Incorrrect Password', user: null });
+                }
+                existingUser.password = hashedPassword;
+                existingUser.save();
+                return res.status(200).json({ success: true });
+            }
+            else {
+                return res
+                    .status(404)
+                    .json({ success: false, message: 'user not found' });
+            }
+        }
+        catch (error) {
+            return res
+                .status(500)
+                .json({ success: false, message: 'An error occured' });
+        }
+    }),
     logout: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         req.logout(err => {
             if (err) {
-                return res.status(500).json({ error: err, message: 'An error occured' });
+                return res
+                    .status(500)
+                    .json({ error: err, success: false, message: 'An error occured' });
             }
-            return res.status(200).json({ message: 'Logout successful' });
+            return res.status(200).json({ success: true });
         });
     }),
 };

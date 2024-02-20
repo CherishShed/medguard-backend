@@ -67,6 +67,7 @@ export interface EmployeeType extends Document {
   phoneNumber: string
   gender: string
   post: string
+  changedPassword: boolean
   patientUnderCare: string[]
 }
 
@@ -79,6 +80,7 @@ const employeeSchema = new mongoose.Schema<EmployeeType>({
   phoneNumber: { type: String, required: true },
   gender: { type: String, required: true },
   post: { type: String },
+  changedPassword: { type: Boolean, required: true },
   patientUnderCare: [
     {
       type: mongoose.Schema.Types.ObjectId,
