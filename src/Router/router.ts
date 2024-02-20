@@ -13,6 +13,7 @@ router.get('/', (req, res) => {
 
 router.post('/healthworker/login', authController.loginUser)
 router.post('/healthworker/changepassword', authController.changePassword)
+router.get('/healthworker/logout', authController.logout)
 router.get('/patient', patientController.getPatientInfo)
 router.post('/patient/vitals', patientController.addVitals)
 router.get('/medication', patientController.getMedications)
