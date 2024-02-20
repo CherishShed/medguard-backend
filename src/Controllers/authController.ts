@@ -4,15 +4,15 @@ import jwt from 'jsonwebtoken'
 import { HealthWorker } from '../Model/database'
 const authController = {
   loginUser: async (req: Request, res: Response) => {
-    const { userName, password } = req.body
+    const { username, password } = req.body
 
     try {
       const user = await HealthWorker.findOne({
-        employeeNumber: (userName as string).toUpperCase(),
+        employeeNumber: (username as string).toUpperCase(),
       })
       if (!user) {
         res
-          .status(401)
+          .status(404)
           .json({ auth: false, message: 'User not found', user: null })
         return
       }
@@ -49,7 +49,9 @@ const authController = {
       return
     } catch (error) {
       if (error) {
-        res.status(500).json({ errors: [{ msg: 'Error authenticating user' }] })
+        res
+          .status(500)
+          .json({ error: error, message: 'Error authenticating user' })
         return
       }
     }

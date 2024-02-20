@@ -17,14 +17,14 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const database_1 = require("../Model/database");
 const authController = {
     loginUser: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const { userName, password } = req.body;
+        const { username, password } = req.body;
         try {
             const user = yield database_1.HealthWorker.findOne({
-                employeeNumber: userName.toUpperCase(),
+                employeeNumber: username.toUpperCase(),
             });
             if (!user) {
                 res
-                    .status(401)
+                    .status(404)
                     .json({ auth: false, message: 'User not found', user: null });
                 return;
             }
@@ -58,7 +58,9 @@ const authController = {
         }
         catch (error) {
             if (error) {
-                res.status(500).json({ errors: [{ msg: 'Error authenticating user' }] });
+                res
+                    .status(500)
+                    .json({ error: error, message: 'Error authenticating user' });
                 return;
             }
         }
