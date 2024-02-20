@@ -44,10 +44,11 @@ mongoose_1.default.connection.on('error', err => {
 });
 const employeeSchema = new mongoose_1.default.Schema({
     employeeNumber: { type: String },
-    clerkId: { type: String, required: true },
+    password: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     dateOfBirth: { type: String, required: true },
+    phoneNumber: { type: String, required: true },
     gender: { type: String, required: true },
     post: { type: String },
     patientUnderCare: [
@@ -72,7 +73,7 @@ const vitalSchema = new mongoose_1.default.Schema({
     heart_beat: { type: Number },
     blood_oxygen: { type: Number },
 }, { timestamps: true });
-const userSchema = new mongoose_1.default.Schema({
+const patientSchema = new mongoose_1.default.Schema({
     hospitalNumber: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
@@ -86,5 +87,5 @@ const userSchema = new mongoose_1.default.Schema({
     medications: [medicationSchema],
     vitals: [vitalSchema],
 }, { timestamps: true });
-exports.Patient = mongoose_1.default.model('Patient', userSchema);
+exports.Patient = mongoose_1.default.model('Patient', patientSchema);
 exports.HealthWorker = mongoose_1.default.model('HealthWorker', employeeSchema);

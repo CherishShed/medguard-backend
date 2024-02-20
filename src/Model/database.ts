@@ -60,10 +60,11 @@ interface IMedication {
 }
 export interface EmployeeType extends Document {
   employeeNumber: string
-  clerkId: string
+  password: string
   firstName: string
   lastName: string
   dateOfBirth: string
+  phoneNumber: string
   gender: string
   post: string
   patientUnderCare: string[]
@@ -71,10 +72,11 @@ export interface EmployeeType extends Document {
 
 const employeeSchema = new mongoose.Schema<EmployeeType>({
   employeeNumber: { type: String },
-  clerkId: { type: String, required: true },
+  password: { type: String, required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   dateOfBirth: { type: String, required: true },
+  phoneNumber: { type: String, required: true },
   gender: { type: String, required: true },
   post: { type: String },
   patientUnderCare: [
@@ -107,7 +109,7 @@ const vitalSchema = new mongoose.Schema<IVital>(
   },
   { timestamps: true }
 )
-const userSchema = new mongoose.Schema<patientType>(
+const patientSchema = new mongoose.Schema<patientType>(
   {
     hospitalNumber: { type: String, required: true },
     firstName: { type: String, required: true },
@@ -125,7 +127,7 @@ const userSchema = new mongoose.Schema<patientType>(
   { timestamps: true }
 )
 
-export const Patient = mongoose.model<patientType>('Patient', userSchema)
+export const Patient = mongoose.model<patientType>('Patient', patientSchema)
 export const HealthWorker = mongoose.model<EmployeeType>(
   'HealthWorker',
   employeeSchema

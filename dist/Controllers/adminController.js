@@ -20,27 +20,6 @@ const EmployeeController = {
             return res.status(500).json({ error: error, message: 'an error occured' });
         }
     }),
-    linkClerkId: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const { employeeNumber, clerkId } = req.query;
-        try {
-            const foundEmployee = yield database_1.HealthWorker.findOne({
-                employeeNumber: employeeNumber,
-            });
-            if (!foundEmployee) {
-                return res
-                    .status(404)
-                    .json({ message: 'User not found', success: false });
-            }
-            else {
-                foundEmployee.clerkId = clerkId;
-                foundEmployee.save();
-                return res.status(200).json({ message: 'success', success: true });
-            }
-        }
-        catch (error) {
-            return res.status(500).json({ message: 'error', error: error });
-        }
-    }),
     dashBoardStatistics: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const allPatients = yield database_1.Patient.find();

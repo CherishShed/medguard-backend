@@ -2,20 +2,29 @@ import express from 'express'
 import 'dotenv/config'
 import patientController from '../Controllers/patientController'
 import EmployeeController from '../Controllers/adminController'
+import 'dotenv/config'
+import passport from '../Middlewares/authMiddleware'
+import authController from '../Controllers/authController'
 const router = express.Router()
 
 router.get('/', (req, res) => {
   res.status(200).json({ message: 'Good' })
 })
 
+router.post('/healthworker/login', authController.loginUser)
+// router.post('/healthworker/signup', authController.registerUser)
 router.get('/patient', patientController.getPatientInfo)
 router.post('/patient/vitals', patientController.addVitals)
 router.get('/medication', patientController.getMedications)
-router.get('/healthworker/patients', EmployeeController.getAllPatients)
+router.get(
+  '/healthworker/patients',
+  passport.authenticate('jwt', { session: false }),
+  EmployeeController.getAllPatients
+)
 router.get(
   '/healthworker/dashboardStatistics',
+  passport.authenticate('jwt', { session: false }),
   EmployeeController.dashBoardStatistics
 )
-router.post('/healthworker/linkClerk', EmployeeController.linkClerkId)
 
 export default router
