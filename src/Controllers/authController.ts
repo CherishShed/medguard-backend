@@ -73,6 +73,7 @@ const authController = {
             .json({ auth: false, message: 'Incorrrect Password', user: null })
         }
         existingUser.password = hashedPassword
+        existingUser.changedPassword = true
         existingUser.save()
         return res.status(200).json({ success: true })
       } else {
