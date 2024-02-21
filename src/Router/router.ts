@@ -11,6 +11,7 @@ router.get('/', (req, res) => {
   res.status(200).json({ message: 'Good' })
 })
 
+router.get('/healthworker', authController.isLoggedIn)
 router.post('/healthworker/login', authController.loginUser)
 router.post('/healthworker/changepassword', authController.changePassword)
 router.get('/healthworker/logout', authController.logout)

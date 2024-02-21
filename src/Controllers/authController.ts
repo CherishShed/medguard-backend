@@ -3,6 +3,13 @@ import { hash, compare } from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { HealthWorker } from '../Model/database'
 const authController = {
+  isLoggedIn: async (req: Request, res: Response) => {
+    if (req.user) {
+      return res.status(200).json({ auth: true })
+    } else {
+      return res.status(401).json({ auth: false })
+    }
+  },
   loginUser: async (req: Request, res: Response) => {
     const { username, password } = req.body
 
