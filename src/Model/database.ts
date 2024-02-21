@@ -37,11 +37,13 @@ export interface patientType extends Document {
   gender: string
   bloodgroup: string
   genotype: string
+  status: string
   phone_number: string
   emergencyContact1: string
   emergencyContact2: string
   medications: IMedication[]
   vitals: IVital[]
+  latestVitals: IVital
 }
 interface IVital {
   blood_pressure: string
@@ -120,11 +122,13 @@ const patientSchema = new mongoose.Schema<patientType>(
     gender: { type: String, required: true },
     bloodgroup: { type: String, required: true },
     genotype: { type: String, required: true },
+    status: { type: String, required: true, default: '' },
     phone_number: { type: String, required: true },
     emergencyContact1: { type: String },
     emergencyContact2: { type: String },
     medications: [medicationSchema],
     vitals: [vitalSchema],
+    latestVitals: vitalSchema,
   },
   { timestamps: true }
 )

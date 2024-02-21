@@ -82,11 +82,13 @@ const patientSchema = new mongoose_1.default.Schema({
     gender: { type: String, required: true },
     bloodgroup: { type: String, required: true },
     genotype: { type: String, required: true },
+    status: { type: String, required: true, default: '' },
     phone_number: { type: String, required: true },
     emergencyContact1: { type: String },
     emergencyContact2: { type: String },
     medications: [medicationSchema],
     vitals: [vitalSchema],
+    latestVitals: vitalSchema,
 }, { timestamps: true });
 exports.Patient = mongoose_1.default.model('Patient', patientSchema);
 exports.HealthWorker = mongoose_1.default.model('HealthWorker', employeeSchema);

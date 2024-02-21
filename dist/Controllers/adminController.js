@@ -13,7 +13,46 @@ const database_1 = require("../Model/database");
 const EmployeeController = {
     getAllPatients: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const allPatients = yield database_1.Patient.find({}, { firstName: 1, lastName: 1, vitals: 1, hospitalNumber: 1, gender: 1 });
+            const allPatients = yield database_1.Patient.find({}, {
+                firstName: 1,
+                lastName: 1,
+                latestVitals: 1,
+                hospitalNumber: 1,
+                gender: 1,
+                status: 1,
+            });
+            allPatients.forEach(patient => {
+                const latestVitals = patient.latestVitals;
+                const bloodPressure = latestVitals.blood_pressure;
+                const [systolic, diastolic] = bloodPressure.split('/').map(Number);
+                if (systolic < 90 ||
+                    systolic > 140 ||
+                    diastolic < 60 ||
+                    diastolic > 90) {
+                    patient.status = 'bad';
+                }
+                else if (systolic < 120 || diastolic < 80) {
+                    patient.status = 'abnormal';
+                }
+                else {
+                    patient.status = 'good';
+                }
+                const heartRate = latestVitals.heart_beat;
+                if (heartRate < 60 || heartRate > 100) {
+                    patient.status = 'bad';
+                }
+                else if (heartRate < 70 || heartRate > 90) {
+                    if (patient.status != 'bad') {
+                        patient.status = 'abnormal';
+                    }
+                }
+                else {
+                    if (patient.status !== ('bad' || 'abnormal')) {
+                        patient.status = 'good';
+                    }
+                }
+                patient.save();
+            });
             return res.status(200).json({ patients: allPatients, success: true });
         }
         catch (error) {
@@ -22,18 +61,18 @@ const EmployeeController = {
     }),
     dashBoardStatistics: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const allPatients = yield database_1.Patient.find();
+            const allPatients = yield database_1.Patient.find({}, { latestVitals: 1 });
             const medPatients = yield database_1.Patient.find({
                 'medications.end_date': {
                     $gte: new Date().toISOString().split('T')[0],
                 },
-            });
+            }, { hospitalNumber: 1 });
             const vitalCount = {
                 warningCount: 0,
                 badCount: 0,
             };
             allPatients.forEach(patient => {
-                const latestVitals = patient.vitals[patient.vitals.length - 1];
+                const latestVitals = patient.latestVitals;
                 const bloodPressure = latestVitals.blood_pressure;
                 const [systolic, diastolic] = bloodPressure.split('/').map(Number);
                 if (systolic < 90 ||
