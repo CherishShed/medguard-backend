@@ -47,7 +47,7 @@ const EmployeeController = {
                     }
                 }
                 else {
-                    if (patient.status !== ('bad' || 'abnormal')) {
+                    if (patient.status !== 'bad' && patient.status !== 'abnormal') {
                         patient.status = 'good';
                     }
                 }
