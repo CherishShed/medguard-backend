@@ -2,10 +2,31 @@ import { Request, Response } from 'express'
 import { hash, compare } from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { HealthWorker } from '../Model/database'
+type userType = {
+  employeeNumber: string
+  firstName: string
+  lastName: string
+  gender: string
+  dateOfBirth: string
+  phoneNumber: string
+  changedPassword: string
+}
 const authController = {
   isLoggedIn: async (req: Request, res: Response) => {
     if (req.user) {
-      return res.status(200).json({ auth: true })
+      const user = (req.user as userType[])[0]
+      return res.status(200).json({
+        auth: true,
+        user: {
+          employeeNumber: user.employeeNumber,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          gender: user.gender,
+          dateOfBirth: user.dateOfBirth,
+          phoneNumber: user.phoneNumber,
+          changedPassword: user.changedPassword,
+        },
+      })
     } else {
       return res.status(401).json({ auth: false })
     }

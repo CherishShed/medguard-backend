@@ -14,7 +14,7 @@ const router = express_1.default.Router();
 router.get('/', (req, res) => {
     res.status(200).json({ message: 'Good' });
 });
-router.get('/healthworker', authController_1.default.isLoggedIn);
+router.get('/healthworker', authMiddleware_1.default.authenticate('jwt', { session: false }), authController_1.default.isLoggedIn);
 router.post('/healthworker/login', authController_1.default.loginUser);
 router.post('/healthworker/changepassword', authController_1.default.changePassword);
 router.get('/healthworker/logout', authController_1.default.logout);
