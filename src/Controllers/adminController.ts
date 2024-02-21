@@ -4,7 +4,10 @@ import { Patient, HealthWorker } from '../Model/database'
 const EmployeeController = {
   getAllPatients: async (req: Request, res: Response) => {
     try {
-      const allPatients = await Patient.find()
+      const allPatients = await Patient.find(
+        {},
+        { firstName: 1, lastName: 1, vitals: 1, hospitalNumber: 1, gender: 1 }
+      )
       return res.status(200).json({ patients: allPatients, success: true })
     } catch (error) {
       return res.status(500).json({ error: error, message: 'an error occured' })

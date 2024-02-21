@@ -13,7 +13,7 @@ const database_1 = require("../Model/database");
 const EmployeeController = {
     getAllPatients: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const allPatients = yield database_1.Patient.find();
+            const allPatients = yield database_1.Patient.find({}, { firstName: 1, lastName: 1, vitals: 1, hospitalNumber: 1, gender: 1 });
             return res.status(200).json({ patients: allPatients, success: true });
         }
         catch (error) {
