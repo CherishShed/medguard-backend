@@ -85,6 +85,7 @@ const EmployeeController = {
                         patient.status = 'good';
                     }
                 }
+                console.log(patient.status);
                 patient.save();
             });
             return res.status(200).json({ patients: allPatients, success: true });
