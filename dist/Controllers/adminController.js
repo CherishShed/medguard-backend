@@ -11,9 +11,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = require("../Model/database");
 const EmployeeController = {
-    getAllPatients: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    getPatientInfo: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const { hospitalNumber } = req.query;
         try {
-            const allPatients = yield database_1.Patient.find({}, {
+            const foundPatient = yield database_1.Patient.findOne({
+                hospitalNumber: hospitalNumber,
+            }, {
                 firstName: 1,
                 lastName: 1,
                 latestVitals: 1,
@@ -26,6 +29,31 @@ const EmployeeController = {
                 phone_number: 1,
                 emergencyContact1: 1,
                 emergencyContact2: 1,
+            });
+            if (foundPatient) {
+                return res
+                    .status(200)
+                    .json({ patient: foundPatient, message: 'Found Record' });
+            }
+            else {
+                return res
+                    .status(404)
+                    .json({ patient: null, message: 'Record does not exist' });
+            }
+        }
+        catch (error) {
+            return res.status(500).json({ error: error, message: 'An error occured' });
+        }
+    }),
+    getAllPatients: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const allPatients = yield database_1.Patient.find({}, {
+                firstName: 1,
+                lastName: 1,
+                latestVitals: 1,
+                hospitalNumber: 1,
+                gender: 1,
+                status: 1,
             });
             allPatients.forEach(patient => {
                 const latestVitals = patient.latestVitals;
