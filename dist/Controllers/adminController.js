@@ -20,6 +20,12 @@ const EmployeeController = {
                 hospitalNumber: 1,
                 gender: 1,
                 status: 1,
+                bloodgroup: 1,
+                dateOfBirth: 1,
+                genotype: 1,
+                phone_number: 1,
+                emergencyContact1: 1,
+                emergencyContact2: 1,
             });
             allPatients.forEach(patient => {
                 const latestVitals = patient.latestVitals;
