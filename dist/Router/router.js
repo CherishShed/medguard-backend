@@ -23,5 +23,6 @@ router.post('/patient/vitals', patientController_1.default.addVitals);
 router.get('/medication', patientController_1.default.getMedications);
 router.get('/healthworker/patients', authMiddleware_1.default.authenticate('jwt', { session: false }), adminController_1.default.getAllPatients);
 router.get('/healthworker/patient', authMiddleware_1.default.authenticate('jwt', { session: false }), adminController_1.default.getPatientInfo);
+router.get('/healthworker/patient/medication', authMiddleware_1.default.authenticate('jwt', { session: false }), adminController_1.default.getPatientMedication);
 router.get('/healthworker/dashboardStatistics', authMiddleware_1.default.authenticate('jwt', { session: false }), adminController_1.default.dashBoardStatistics);
 exports.default = router;

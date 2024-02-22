@@ -37,6 +37,35 @@ const EmployeeController = {
       return res.status(500).json({ error: error, message: 'An error occured' })
     }
   },
+  getPatientMedication: async (req: Request, res: Response) => {
+    const { hospitalNumber } = req.query
+    try {
+      const foundPatient = await Patient.findOne(
+        {
+          hospitalNumber: hospitalNumber,
+        },
+        {
+          firstName: 1,
+          lastName: 1,
+          hospitalNumber: 1,
+          gender: 1,
+          medications: 1,
+          phone_number: 1,
+        }
+      )
+      if (foundPatient) {
+        return res
+          .status(200)
+          .json({ patient: foundPatient, message: 'Found Record' })
+      } else {
+        return res
+          .status(404)
+          .json({ patient: null, message: 'Record does not exist' })
+      }
+    } catch (error) {
+      return res.status(500).json({ error: error, message: 'An error occured' })
+    }
+  },
   getAllPatients: async (req: Request, res: Response) => {
     try {
       const allPatients = await Patient.find(
