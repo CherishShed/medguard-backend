@@ -44,6 +44,7 @@ export interface patientType extends Document {
   medications: IMedication[]
   vitals: IVital[]
   latestVitals: IVital
+  lastUpdatedBy: string
 }
 interface IVital {
   blood_pressure: string
@@ -129,7 +130,14 @@ const patientSchema = new mongoose.Schema<patientType>(
     medications: [medicationSchema],
     vitals: [vitalSchema],
     latestVitals: vitalSchema,
+    lastUpdatedBy: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'HealthWorker',
+      },
+    ],
   },
+
   { timestamps: true }
 )
 

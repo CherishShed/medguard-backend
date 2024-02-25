@@ -55,13 +55,49 @@ const EmployeeController = {
                 lastName: 1,
                 hospitalNumber: 1,
                 gender: 1,
-                medications: 1,
                 phone_number: 1,
+                lastUpdatedBy: 1,
+            }).populate({
+                path: 'medications',
+                populate: {
+                    path: 'lastUpdatedBy',
+                    select: 'firstName lastName -_id',
+                },
             });
+            const currentDate = new Date().toISOString().split('T')[0];
             if (foundPatient) {
-                return res
-                    .status(200)
-                    .json({ patient: foundPatient, message: 'Found Record' });
+                let endedPrescriptions = yield database_1.Patient.aggregate([
+                    { $match: { hospitalNumber } },
+                    { $unwind: '$medications' },
+                    {
+                        $match: {
+                            'medications.end_date': { $lt: currentDate },
+                        },
+                    },
+                    { $group: { _id: '$_id', medications: { $push: '$medications' } } },
+                ]);
+                endedPrescriptions =
+                    endedPrescriptions.length > 0 ? endedPrescriptions[0].medications : [];
+                let activePrescriptions = yield database_1.Patient.aggregate([
+                    { $match: { hospitalNumber } },
+                    { $unwind: '$medications' },
+                    {
+                        $match: {
+                            'medications.end_date': { $gte: currentDate },
+                        },
+                    },
+                    { $group: { _id: '$_id', medications: { $push: '$medications' } } },
+                ]);
+                activePrescriptions =
+                    activePrescriptions.length > 0
+                        ? activePrescriptions[0].medications
+                        : [];
+                return res.status(200).json({
+                    patient: foundPatient,
+                    message: 'Found Record',
+                    activePrescriptions,
+                    endedPrescriptions,
+                });
             }
             else {
                 return res
