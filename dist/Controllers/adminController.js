@@ -58,11 +58,8 @@ const EmployeeController = {
                 phone_number: 1,
                 lastUpdatedBy: 1,
             }).populate({
-                path: 'medications',
-                populate: {
-                    path: 'lastUpdatedBy',
-                    select: 'firstName lastName -_id',
-                },
+                path: 'lastUpdatedBy',
+                select: 'firstName lastName -_id',
             });
             const currentDate = new Date().toISOString().split('T')[0];
             if (foundPatient) {

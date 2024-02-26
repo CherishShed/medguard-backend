@@ -53,11 +53,8 @@ const EmployeeController = {
           lastUpdatedBy: 1,
         }
       ).populate({
-        path: 'medications',
-        populate: {
-          path: 'lastUpdatedBy',
-          select: 'firstName lastName -_id', // Select only firstName and lastName fields
-        },
+        path: 'lastUpdatedBy',
+        select: 'firstName lastName -_id', // Select only firstName and lastName fields
       })
       const currentDate = new Date().toISOString().split('T')[0] // Get current date in ISO format
       if (foundPatient) {
