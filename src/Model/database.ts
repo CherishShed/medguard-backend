@@ -1,4 +1,4 @@
-import mongoose, { Date, Document } from 'mongoose'
+import mongoose, { Date, Document, ObjectId } from 'mongoose'
 import 'dotenv/config'
 mongoose.set('strictQuery', true)
 export const connectToDatabase = async () => {
@@ -44,7 +44,7 @@ export interface patientType extends Document {
   medications: IMedication[]
   vitals: IVital[]
   latestVitals: IVital
-  lastUpdatedBy: string
+  lastUpdatedBy: ObjectId
 }
 interface IVital {
   blood_pressure: string
@@ -130,12 +130,10 @@ const patientSchema = new mongoose.Schema<patientType>(
     medications: [medicationSchema],
     vitals: [vitalSchema],
     latestVitals: vitalSchema,
-    lastUpdatedBy: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'HealthWorker',
-      },
-    ],
+    lastUpdatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'HealthWorker',
+    },
   },
 
   { timestamps: true }

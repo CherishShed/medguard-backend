@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { Patient, HealthWorker } from '../Model/database'
+import { EmployeeType, Patient } from '../Model/database'
 
 const EmployeeController = {
   getPatientInfo: async (req: Request, res: Response) => {
@@ -208,6 +208,30 @@ const EmployeeController = {
       })
     } catch (error) {
       return res.status(500).json({ message: 'error', error: error })
+    }
+  },
+  addMedication: async (req: Request, res: Response) => {
+    const { hospitalNumber } = req.query
+    const medData = req.body
+    try {
+      const foundPatient = await Patient.findOne({
+        hospitalNumber: hospitalNumber,
+      })
+      if (!foundPatient) {
+        return res
+          .status(404)
+          .json({ message: 'Patient not found', success: false })
+      }
+      foundPatient.medications.push(medData)
+      foundPatient.lastUpdatedBy = (req.user as EmployeeType[])[0]._id
+      foundPatient.save()
+      return res
+        .status(200)
+        .json({ message: 'Added Successfully', success: true })
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: 'An error occurred', success: false })
     }
   },
 }

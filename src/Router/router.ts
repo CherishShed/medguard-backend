@@ -42,5 +42,10 @@ router.get(
   passport.authenticate('jwt', { session: false }),
   EmployeeController.dashBoardStatistics
 )
+router.post(
+  '/healthworker/patient/medication',
+  passport.authenticate('jwt', { session: false }),
+  EmployeeController.addMedication
+)
 
 export default router

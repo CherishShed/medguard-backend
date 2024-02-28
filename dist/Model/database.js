@@ -89,12 +89,10 @@ const patientSchema = new mongoose_1.default.Schema({
     medications: [medicationSchema],
     vitals: [vitalSchema],
     latestVitals: vitalSchema,
-    lastUpdatedBy: [
-        {
-            type: mongoose_1.default.Schema.Types.ObjectId,
-            ref: 'HealthWorker',
-        },
-    ],
+    lastUpdatedBy: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: 'HealthWorker',
+    },
 }, { timestamps: true });
 exports.Patient = mongoose_1.default.model('Patient', patientSchema);
 exports.HealthWorker = mongoose_1.default.model('HealthWorker', employeeSchema);

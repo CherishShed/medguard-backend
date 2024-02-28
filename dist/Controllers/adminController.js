@@ -198,5 +198,30 @@ const EmployeeController = {
             return res.status(500).json({ message: 'error', error: error });
         }
     }),
+    addMedication: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const { hospitalNumber } = req.query;
+        const medData = req.body;
+        try {
+            const foundPatient = yield database_1.Patient.findOne({
+                hospitalNumber: hospitalNumber,
+            });
+            if (!foundPatient) {
+                return res
+                    .status(404)
+                    .json({ message: 'Patient not found', success: false });
+            }
+            foundPatient.medications.push(medData);
+            foundPatient.lastUpdatedBy = req.user[0]._id;
+            foundPatient.save();
+            return res
+                .status(200)
+                .json({ message: 'Added Successfully', success: true });
+        }
+        catch (error) {
+            return res
+                .status(500)
+                .json({ message: 'An error occurred', success: false });
+        }
+    }),
 };
 exports.default = EmployeeController;
