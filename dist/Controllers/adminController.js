@@ -223,5 +223,33 @@ const EmployeeController = {
                 .json({ message: 'An error occurred', success: false });
         }
     }),
+    getPatientVitals: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const { hospitalNumber } = req.query;
+        try {
+            const foundPatient = yield database_1.Patient.findOne({
+                hospitalNumber: hospitalNumber,
+            }, {
+                firstName: 1,
+                lastName: 1,
+                hospitalNumber: 1,
+                gender: 1,
+                phone_number: 1,
+                vitals: 1,
+            });
+            if (!foundPatient) {
+                return res
+                    .status(404)
+                    .json({ message: 'Patient not found', success: false });
+            }
+            return res
+                .status(200)
+                .json({ patientDetails: foundPatient, success: true });
+        }
+        catch (error) {
+            return res
+                .status(500)
+                .json({ message: 'An error occurred', success: false });
+        }
+    }),
 };
 exports.default = EmployeeController;

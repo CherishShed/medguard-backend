@@ -47,5 +47,10 @@ router.post(
   passport.authenticate('jwt', { session: false }),
   EmployeeController.addMedication
 )
+router.get(
+  '/healthworker/patient/vitals',
+  passport.authenticate('jwt', { session: false }),
+  EmployeeController.getPatientVitals
+)
 
 export default router
