@@ -26,5 +26,5 @@ router.get('/healthworker/patient', authMiddleware_1.default.authenticate('jwt',
 router.get('/healthworker/patient/medication', authMiddleware_1.default.authenticate('jwt', { session: false }), adminController_1.default.getPatientMedication);
 router.get('/healthworker/dashboardStatistics', authMiddleware_1.default.authenticate('jwt', { session: false }), adminController_1.default.dashBoardStatistics);
 router.post('/healthworker/patient/medication', authMiddleware_1.default.authenticate('jwt', { session: false }), adminController_1.default.addMedication);
-router.get('/healthworker/patient', authMiddleware_1.default.authenticate('jwt', { session: false }), adminController_1.default.getPatientVitals);
+router.get('/healthworker/patient/vitals', authMiddleware_1.default.authenticate('jwt', { session: false }), adminController_1.default.getPatientVitals);
 exports.default = router;
