@@ -227,7 +227,7 @@ const EmployeeController = {
       foundPatient.save()
       return res
         .status(200)
-        .json({ message: 'Added Successfully', success: true })
+        .json({ message: 'Added Medication Successfully', success: true })
     } catch (error) {
       return res
         .status(500)
