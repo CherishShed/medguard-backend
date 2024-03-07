@@ -1,5 +1,8 @@
 import mongoose, { Date, Document, ObjectId } from 'mongoose'
 import 'dotenv/config'
+import cron from 'node-cron'
+import { updatePrescriptions } from '../Utils/helperFunctions'
+
 mongoose.set('strictQuery', true)
 export const connectToDatabase = async () => {
   mongoose
@@ -8,6 +11,10 @@ export const connectToDatabase = async () => {
     })
     .then(() => {
       console.log('Database Connection Succeeded')
+      cron.schedule('0 0 * * *', () => {
+        console.log('Running job...')
+        updatePrescriptions()
+      })
     })
     .catch(err => {
       console.log(`An error occurred connecting to database: ${err}`)
@@ -17,18 +24,8 @@ mongoose.connection.on('error', err => {
   console.log(
     `An error occurred connecting to database: ${err},\n...reconnecting`
   )
-  mongoose
-    .connect(process.env.CONNECTION_STRING! as string, {
-      dbName: 'MedGuard',
-    })
-    .then(() => {
-      console.log('Database Connection Succeeded')
-    })
-    .catch(err => {
-      console.log(`An error occurred connecting to database ${err}`)
-    })
+  connectToDatabase()
 })
-
 export interface patientType extends Document {
   hospitalNumber: string
   firstName: string
@@ -41,7 +38,7 @@ export interface patientType extends Document {
   phone_number: string
   emergencyContact1: string
   emergencyContact2: string
-  medications: IMedication[]
+  prescriptions: Array<IMedication[]>
   vitals: IVital[]
   latestVitals: IVital
   lastUpdatedBy: ObjectId
@@ -73,7 +70,12 @@ export interface EmployeeType extends Document {
   changedPassword: boolean
   patientUnderCare: string[]
 }
-
+export interface PrescriptionType extends Document {
+  prescriptionDate: string
+  drugs: Array<IMedication[]>
+  patient: string
+  active: boolean
+}
 const employeeSchema = new mongoose.Schema<EmployeeType>({
   employeeNumber: { type: String },
   password: { type: String, required: true },
@@ -92,20 +94,29 @@ const employeeSchema = new mongoose.Schema<EmployeeType>({
   ],
 })
 
-const medicationSchema = new mongoose.Schema<IMedication>(
+const medicationSchema = new mongoose.Schema<IMedication>({
+  name: { type: String },
+  instructions: { type: String },
+  morning: { type: { amount: Number, time: String } },
+  afternoon: { type: { amount: Number, time: String } },
+  night: { type: { amount: Number, time: String } },
+  type: { type: String },
+  start_date: { type: String, default: Date.now().toString() },
+  end_date: { type: String, default: Date.now().toString() },
+})
+
+const prescriptionSchema = new mongoose.Schema<PrescriptionType>(
   {
-    name: { type: String },
-    instructions: { type: String },
-    morning: { type: { amount: Number, time: String } },
-    afternoon: { type: { amount: Number, time: String } },
-    night: { type: { amount: Number, time: String } },
-    type: { type: String },
-    start_date: { type: String, default: Date.now().toString() },
-    end_date: { type: String, default: Date.now().toString() },
+    prescriptionDate: { type: String },
+    drugs: [medicationSchema],
+    patient: {
+      type: String,
+      ref: 'Patient',
+    },
+    active: { type: Boolean, default: true },
   },
   { timestamps: true }
 )
-
 const vitalSchema = new mongoose.Schema<IVital>(
   {
     blood_pressure: { type: String },
@@ -116,7 +127,7 @@ const vitalSchema = new mongoose.Schema<IVital>(
 )
 const patientSchema = new mongoose.Schema<patientType>(
   {
-    hospitalNumber: { type: String, required: true },
+    hospitalNumber: { type: String, required: true, unique: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     dateOfBirth: { type: String, required: true },
@@ -127,7 +138,6 @@ const patientSchema = new mongoose.Schema<patientType>(
     phone_number: { type: String, required: true },
     emergencyContact1: { type: String },
     emergencyContact2: { type: String },
-    medications: [medicationSchema],
     vitals: [vitalSchema],
     latestVitals: vitalSchema,
     lastUpdatedBy: {
@@ -143,4 +153,8 @@ export const Patient = mongoose.model<patientType>('Patient', patientSchema)
 export const HealthWorker = mongoose.model<EmployeeType>(
   'HealthWorker',
   employeeSchema
+)
+export const Prescription = mongoose.model<PrescriptionType>(
+  'Prescription',
+  prescriptionSchema
 )

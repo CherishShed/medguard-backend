@@ -66,13 +66,11 @@ const patientController = {
     getMedications: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { hospitalNumber } = req.query;
         try {
-            const foundPatient = yield database_1.Patient.findOne({
-                hospitalNumber: hospitalNumber,
-            }, { medications: 1 });
-            if (foundPatient) {
-                return res
-                    .status(200)
-                    .json({ medication: foundPatient.medications, message: 'Success' });
+            const prescriptions = yield database_1.Prescription.find({
+                patient: hospitalNumber,
+            });
+            if (prescriptions.length > 0) {
+                return res.status(200).json({ prescriptions, message: 'Success' });
             }
             else {
                 return res

@@ -12,9 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HealthWorker = exports.Patient = exports.connectToDatabase = void 0;
+exports.Prescription = exports.HealthWorker = exports.Patient = exports.connectToDatabase = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 require("dotenv/config");
+const node_cron_1 = __importDefault(require("node-cron"));
+const helperFunctions_1 = require("../Utils/helperFunctions");
 mongoose_1.default.set('strictQuery', true);
 const connectToDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     mongoose_1.default
@@ -23,6 +25,10 @@ const connectToDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     })
         .then(() => {
         console.log('Database Connection Succeeded');
+        node_cron_1.default.schedule('0 0 * * *', () => {
+            console.log('Running job...');
+            (0, helperFunctions_1.updatePrescriptions)();
+        });
     })
         .catch(err => {
         console.log(`An error occurred connecting to database: ${err}`);
@@ -31,16 +37,7 @@ const connectToDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
 exports.connectToDatabase = connectToDatabase;
 mongoose_1.default.connection.on('error', err => {
     console.log(`An error occurred connecting to database: ${err},\n...reconnecting`);
-    mongoose_1.default
-        .connect(process.env.CONNECTION_STRING, {
-        dbName: 'MedGuard',
-    })
-        .then(() => {
-        console.log('Database Connection Succeeded');
-    })
-        .catch(err => {
-        console.log(`An error occurred connecting to database ${err}`);
-    });
+    (0, exports.connectToDatabase)();
 });
 const employeeSchema = new mongoose_1.default.Schema({
     employeeNumber: { type: String },
@@ -68,6 +65,15 @@ const medicationSchema = new mongoose_1.default.Schema({
     type: { type: String },
     start_date: { type: String, default: Date.now().toString() },
     end_date: { type: String, default: Date.now().toString() },
+});
+const prescriptionSchema = new mongoose_1.default.Schema({
+    prescriptionDate: { type: String },
+    drugs: [medicationSchema],
+    patient: {
+        type: String,
+        ref: 'Patient',
+    },
+    active: { type: Boolean, default: true },
 }, { timestamps: true });
 const vitalSchema = new mongoose_1.default.Schema({
     blood_pressure: { type: String },
@@ -75,7 +81,7 @@ const vitalSchema = new mongoose_1.default.Schema({
     blood_oxygen: { type: Number },
 }, { timestamps: true });
 const patientSchema = new mongoose_1.default.Schema({
-    hospitalNumber: { type: String, required: true },
+    hospitalNumber: { type: String, required: true, unique: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     dateOfBirth: { type: String, required: true },
@@ -86,7 +92,6 @@ const patientSchema = new mongoose_1.default.Schema({
     phone_number: { type: String, required: true },
     emergencyContact1: { type: String },
     emergencyContact2: { type: String },
-    medications: [medicationSchema],
     vitals: [vitalSchema],
     latestVitals: vitalSchema,
     lastUpdatedBy: {
@@ -96,3 +101,4 @@ const patientSchema = new mongoose_1.default.Schema({
 }, { timestamps: true });
 exports.Patient = mongoose_1.default.model('Patient', patientSchema);
 exports.HealthWorker = mongoose_1.default.model('HealthWorker', employeeSchema);
+exports.Prescription = mongoose_1.default.model('Prescription', prescriptionSchema);

@@ -33,16 +33,21 @@ router.get(
   EmployeeController.getPatientInfo
 )
 router.get(
-  '/healthworker/patient/medication',
+  '/healthworker/patient/prescription',
   passport.authenticate('jwt', { session: false }),
-  EmployeeController.getPatientMedication
+  EmployeeController.getPatientPrescriptions
+)
+router.post(
+  '/healthworker/patient/prescription',
+  passport.authenticate('jwt', { session: false }),
+  EmployeeController.addPrescription
 )
 router.get(
   '/healthworker/dashboardStatistics',
   passport.authenticate('jwt', { session: false }),
   EmployeeController.dashBoardStatistics
 )
-router.post(
+router.patch(
   '/healthworker/patient/medication',
   passport.authenticate('jwt', { session: false }),
   EmployeeController.addMedication

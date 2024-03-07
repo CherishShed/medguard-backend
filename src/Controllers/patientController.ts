@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { Patient } from '../Model/database'
+import { Patient, Prescription } from '../Model/database'
 
 const patientController = {
   getPatientInfo: async (req: Request, res: Response) => {
@@ -57,16 +57,11 @@ const patientController = {
   getMedications: async (req: Request, res: Response) => {
     const { hospitalNumber } = req.query
     try {
-      const foundPatient = await Patient.findOne(
-        {
-          hospitalNumber: hospitalNumber,
-        },
-        { medications: 1 }
-      )
-      if (foundPatient) {
-        return res
-          .status(200)
-          .json({ medication: foundPatient.medications, message: 'Success' })
+      const prescriptions = await Prescription.find({
+        patient: hospitalNumber,
+      })
+      if (prescriptions.length > 0) {
+        return res.status(200).json({ prescriptions, message: 'Success' })
       } else {
         return res
           .status(404)

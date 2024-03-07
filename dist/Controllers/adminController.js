@@ -45,7 +45,7 @@ const EmployeeController = {
             return res.status(500).json({ error: error, message: 'An error occured' });
         }
     }),
-    getPatientMedication: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    getPatientPrescriptions: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { hospitalNumber } = req.query;
         try {
             const foundPatient = yield database_1.Patient.findOne({
@@ -61,34 +61,22 @@ const EmployeeController = {
                 path: 'lastUpdatedBy',
                 select: 'firstName lastName -_id',
             });
-            const currentDate = new Date().toISOString().split('T')[0];
             if (foundPatient) {
-                let endedPrescriptions = yield database_1.Patient.aggregate([
-                    { $match: { hospitalNumber } },
-                    { $unwind: '$medications' },
-                    {
-                        $match: {
-                            'medications.end_date': { $lt: currentDate },
-                        },
-                    },
-                    { $group: { _id: '$_id', medications: { $push: '$medications' } } },
-                ]);
-                endedPrescriptions =
-                    endedPrescriptions.length > 0 ? endedPrescriptions[0].medications : [];
-                let activePrescriptions = yield database_1.Patient.aggregate([
-                    { $match: { hospitalNumber } },
-                    { $unwind: '$medications' },
-                    {
-                        $match: {
-                            'medications.end_date': { $gte: currentDate },
-                        },
-                    },
-                    { $group: { _id: '$_id', medications: { $push: '$medications' } } },
-                ]);
-                activePrescriptions =
-                    activePrescriptions.length > 0
-                        ? activePrescriptions[0].medications
-                        : [];
+                const prescriptions = yield database_1.Prescription.find({
+                    patient: hospitalNumber,
+                });
+                const activePrescriptions = prescriptions.filter(prescription => prescription.active === true);
+                const endedPrescriptions = prescriptions.filter(prescription => prescription.active === false);
+                activePrescriptions.sort((a, b) => {
+                    const dateA = new Date(a.prescriptionDate).getTime();
+                    const dateB = new Date(b.prescriptionDate).getTime();
+                    return dateB - dateA;
+                });
+                endedPrescriptions.sort((a, b) => {
+                    const dateA = new Date(a.prescriptionDate).getTime();
+                    const dateB = new Date(b.prescriptionDate).getTime();
+                    return dateB - dateA;
+                });
                 return res.status(200).json({
                     patient: foundPatient,
                     message: 'Found Record',
@@ -157,11 +145,9 @@ const EmployeeController = {
     dashBoardStatistics: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const allPatients = yield database_1.Patient.find({}, { latestVitals: 1 });
-            const medPatients = yield database_1.Patient.find({
-                'medications.end_date': {
-                    $gte: new Date().toISOString().split('T')[0],
-                },
-            }, { hospitalNumber: 1 });
+            const medPatients = yield database_1.Prescription.find({
+                active: true,
+            }, { active: 1 });
             const vitalCount = {
                 warningCount: 0,
                 badCount: 0,
@@ -199,20 +185,18 @@ const EmployeeController = {
         }
     }),
     addMedication: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const { hospitalNumber } = req.query;
+        const { prescriptionId } = req.query;
         const medData = req.body;
         try {
-            const foundPatient = yield database_1.Patient.findOne({
-                hospitalNumber: hospitalNumber,
-            });
-            if (!foundPatient) {
+            const updatedPrescription = yield database_1.Prescription.findOneAndUpdate({ id: prescriptionId }, { $push: { drugs: medData } });
+            if (!updatedPrescription) {
                 return res
                     .status(404)
-                    .json({ message: 'Patient not found', success: false });
+                    .json({ message: 'Invalid Prescription', success: false });
             }
-            foundPatient.medications.push(medData);
-            foundPatient.lastUpdatedBy = req.user[0]._id;
-            foundPatient.save();
+            if (new Date(medData.end_date) > new Date(Date.now())) {
+                updatedPrescription.active = true;
+            }
             return res
                 .status(200)
                 .json({ message: 'Added Medication Successfully', success: true });
@@ -220,7 +204,28 @@ const EmployeeController = {
         catch (error) {
             return res
                 .status(500)
-                .json({ message: 'An error occurred', success: false });
+                .json({ message: 'An error occurred', success: false, error });
+        }
+    }),
+    addPrescription: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const { prescriptionDate, drugs, hospitalNumber } = req.body;
+            const newPrescription = new database_1.Prescription({
+                prescriptionDate,
+                drugs,
+                patient: hospitalNumber,
+            });
+            yield newPrescription.save();
+            res.status(201).json({
+                message: 'Prescription created successfully',
+                prescription: newPrescription,
+            });
+        }
+        catch (error) {
+            console.error('Error creating prescription:', error);
+            res
+                .status(500)
+                .json({ error: 'An error occurred while creating prescription' });
         }
     }),
     getPatientVitals: (req, res) => __awaiter(void 0, void 0, void 0, function* () {

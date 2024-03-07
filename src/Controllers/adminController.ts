@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { EmployeeType, Patient } from '../Model/database'
+import { Patient, Prescription } from '../Model/database'
 
 const EmployeeController = {
   getPatientInfo: async (req: Request, res: Response) => {
@@ -37,7 +37,7 @@ const EmployeeController = {
       return res.status(500).json({ error: error, message: 'An error occured' })
     }
   },
-  getPatientMedication: async (req: Request, res: Response) => {
+  getPatientPrescriptions: async (req: Request, res: Response) => {
     const { hospitalNumber } = req.query
     try {
       const foundPatient = await Patient.findOne(
@@ -55,36 +55,34 @@ const EmployeeController = {
       ).populate({
         path: 'lastUpdatedBy',
         select: 'firstName lastName -_id', // Select only firstName and lastName fields
-      })
-      const currentDate = new Date().toISOString().split('T')[0] // Get current date in ISO format
+      }) // Get current date in ISO format
       if (foundPatient) {
-        let endedPrescriptions = await Patient.aggregate([
-          { $match: { hospitalNumber } }, // Match the patient with the specified hospitalNumber
-          { $unwind: '$medications' }, // Split the medications array into separate documents
-          {
-            $match: {
-              'medications.end_date': { $lt: currentDate }, // Find medications where end_date is less than or equal to current date
-            },
-          },
-          { $group: { _id: '$_id', medications: { $push: '$medications' } } }, // Regroup the medications into an array
-        ])
-        endedPrescriptions =
-          endedPrescriptions.length > 0 ? endedPrescriptions[0].medications : []
-        let activePrescriptions = await Patient.aggregate([
-          { $match: { hospitalNumber } }, // Match the patient with the specified hospitalNumber
-          { $unwind: '$medications' }, // Split the medications array into separate documents
-          {
-            $match: {
-              'medications.end_date': { $gte: currentDate }, // Find medications where end_date is greater than current date
-            },
-          },
-          { $group: { _id: '$_id', medications: { $push: '$medications' } } }, // Regroup the medications into an array
-        ])
+        // Find all prescriptions for the given patient
+        const prescriptions = await Prescription.find({
+          patient: hospitalNumber,
+        })
 
-        activePrescriptions =
-          activePrescriptions.length > 0
-            ? activePrescriptions[0].medications
-            : []
+        // Separate prescriptions into active and inactive categories
+        const activePrescriptions = prescriptions.filter(
+          prescription => prescription.active === true
+        )
+        const endedPrescriptions = prescriptions.filter(
+          prescription => prescription.active === false
+        )
+
+        // Sort active prescriptions by prescriptionDate in descending order
+        activePrescriptions.sort((a, b) => {
+          const dateA = new Date(a.prescriptionDate).getTime()
+          const dateB = new Date(b.prescriptionDate).getTime()
+          return dateB - dateA
+        })
+
+        // Sort inactive prescriptions by prescriptionDate in descending order
+        endedPrescriptions.sort((a, b) => {
+          const dateA = new Date(a.prescriptionDate).getTime()
+          const dateB = new Date(b.prescriptionDate).getTime()
+          return dateB - dateA
+        })
         return res.status(200).json({
           patient: foundPatient,
           message: 'Found Record',
@@ -156,13 +154,11 @@ const EmployeeController = {
   dashBoardStatistics: async (req: Request, res: Response) => {
     try {
       const allPatients = await Patient.find({}, { latestVitals: 1 })
-      const medPatients = await Patient.find(
+      const medPatients = await Prescription.find(
         {
-          'medications.end_date': {
-            $gte: new Date().toISOString().split('T')[0],
-          },
+          active: true,
         },
-        { hospitalNumber: 1 }
+        { active: 1 }
       )
 
       const vitalCount = {
@@ -211,27 +207,54 @@ const EmployeeController = {
     }
   },
   addMedication: async (req: Request, res: Response) => {
-    const { hospitalNumber } = req.query
+    const { prescriptionId } = req.query
     const medData = req.body
     try {
-      const foundPatient = await Patient.findOne({
-        hospitalNumber: hospitalNumber,
-      })
-      if (!foundPatient) {
+      const updatedPrescription = await Prescription.findOneAndUpdate(
+        { id: prescriptionId }, // Find the prescription by its ID
+        { $push: { drugs: medData } } // Push the new medication into the drugs array
+      )
+
+      if (!updatedPrescription) {
         return res
           .status(404)
-          .json({ message: 'Patient not found', success: false })
+          .json({ message: 'Invalid Prescription', success: false })
       }
-      foundPatient.medications.push(medData)
-      foundPatient.lastUpdatedBy = (req.user as EmployeeType[])[0]._id
-      foundPatient.save()
+      if (new Date(medData.end_date) > new Date(Date.now())) {
+        updatedPrescription.active = true
+      }
       return res
         .status(200)
         .json({ message: 'Added Medication Successfully', success: true })
     } catch (error) {
       return res
         .status(500)
-        .json({ message: 'An error occurred', success: false })
+        .json({ message: 'An error occurred', success: false, error })
+    }
+  },
+  addPrescription: async (req: Request, res: Response) => {
+    try {
+      const { prescriptionDate, drugs, hospitalNumber } = req.body
+
+      // Create a new prescription document
+      const newPrescription = new Prescription({
+        prescriptionDate,
+        drugs,
+        patient: hospitalNumber,
+      })
+
+      // Save the new prescription to the database
+      await newPrescription.save()
+
+      res.status(201).json({
+        message: 'Prescription created successfully',
+        prescription: newPrescription,
+      })
+    } catch (error) {
+      console.error('Error creating prescription:', error)
+      res
+        .status(500)
+        .json({ error: 'An error occurred while creating prescription' })
     }
   },
   getPatientVitals: async (req: Request, res: Response) => {
