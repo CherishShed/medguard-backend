@@ -235,7 +235,6 @@ const EmployeeController = {
   addPrescription: async (req: Request, res: Response) => {
     try {
       const { prescriptionDate, drugs, hospitalNumber } = req.body
-
       // Create a new prescription document
       const newPrescription = new Prescription({
         prescriptionDate,
