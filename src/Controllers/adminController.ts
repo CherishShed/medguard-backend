@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 import { Patient, Prescription } from '../Model/database'
-
 const EmployeeController = {
   getPatientInfo: async (req: Request, res: Response) => {
     const { hospitalNumber } = req.query
@@ -153,7 +152,7 @@ const EmployeeController = {
 
   dashBoardStatistics: async (req: Request, res: Response) => {
     try {
-      const allPatients = await Patient.find({}, { latestVitals: 1 })
+      const allPatients = await Patient.find({}, { status: 1 })
       const medPatients = await Prescription.find(
         {
           active: true,
@@ -167,32 +166,10 @@ const EmployeeController = {
       }
       allPatients.forEach(patient => {
         // Get the latest vitals for the patient
-        const latestVitals = patient.latestVitals
-
-        // Check blood pressure
-        const bloodPressure = latestVitals.blood_pressure
-        const [systolic, diastolic] = bloodPressure.split('/').map(Number)
-
-        if (
-          systolic < 90 ||
-          systolic > 140 ||
-          diastolic < 60 ||
-          diastolic > 90
-        ) {
-          // Abnormal blood pressure
+        const status = patient.status
+        if (status === 'bad') {
           vitalCount.badCount++
-        } else if (systolic < 120 || diastolic < 80) {
-          // Warning for blood pressure
-          vitalCount.warningCount++
-        }
-
-        // Check heart rate
-        const heartRate = latestVitals.heart_beat
-        if (heartRate < 60 || heartRate > 100) {
-          // Abnormal heart rate
-          vitalCount.badCount++
-        } else if (heartRate < 70 || heartRate > 90) {
-          // Warning for heart rate
+        } else if (status === 'abnormal') {
           vitalCount.warningCount++
         }
       })
@@ -270,6 +247,7 @@ const EmployeeController = {
           gender: 1,
           phone_number: 1,
           vitals: 1,
+          status: 1,
         }
       )
       if (!foundPatient) {
@@ -287,5 +265,4 @@ const EmployeeController = {
     }
   },
 }
-
 export default EmployeeController

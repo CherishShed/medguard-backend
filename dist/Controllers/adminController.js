@@ -144,7 +144,7 @@ const EmployeeController = {
     }),
     dashBoardStatistics: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const allPatients = yield database_1.Patient.find({}, { latestVitals: 1 });
+            const allPatients = yield database_1.Patient.find({}, { status: 1 });
             const medPatients = yield database_1.Prescription.find({
                 active: true,
             }, { active: 1 });
@@ -153,23 +153,11 @@ const EmployeeController = {
                 badCount: 0,
             };
             allPatients.forEach(patient => {
-                const latestVitals = patient.latestVitals;
-                const bloodPressure = latestVitals.blood_pressure;
-                const [systolic, diastolic] = bloodPressure.split('/').map(Number);
-                if (systolic < 90 ||
-                    systolic > 140 ||
-                    diastolic < 60 ||
-                    diastolic > 90) {
+                const status = patient.status;
+                if (status === 'bad') {
                     vitalCount.badCount++;
                 }
-                else if (systolic < 120 || diastolic < 80) {
-                    vitalCount.warningCount++;
-                }
-                const heartRate = latestVitals.heart_beat;
-                if (heartRate < 60 || heartRate > 100) {
-                    vitalCount.badCount++;
-                }
-                else if (heartRate < 70 || heartRate > 90) {
+                else if (status === 'abnormal') {
                     vitalCount.warningCount++;
                 }
             });
@@ -240,6 +228,7 @@ const EmployeeController = {
                 gender: 1,
                 phone_number: 1,
                 vitals: 1,
+                status: 1,
             });
             if (!foundPatient) {
                 return res
