@@ -37,6 +37,11 @@ router.get(
   passport.authenticate('jwt', { session: false }),
   EmployeeController.getPatientPrescriptions
 )
+router.get(
+  '/healthworker/patient/singleprescription',
+  passport.authenticate('jwt', { session: false }),
+  EmployeeController.getSinglePrescription
+)
 router.post(
   '/healthworker/patient/prescription',
   passport.authenticate('jwt', { session: false }),

@@ -264,5 +264,21 @@ const EmployeeController = {
         .json({ message: 'An error occurred', success: false })
     }
   },
+  getSinglePrescription: async (req: Request, res: Response) => {
+    const { prescriptionId } = req.query
+    try {
+      const prescription = await Prescription.findById(prescriptionId)
+      if (!prescription) {
+        return res
+          .status(404)
+          .json({ message: 'Invalid Prescription', success: false })
+      }
+      return res.status(200).json({ prescription, success: true })
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: 'An error occurred', success: false, error })
+    }
+  },
 }
 export default EmployeeController

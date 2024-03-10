@@ -245,5 +245,22 @@ const EmployeeController = {
                 .json({ message: 'An error occurred', success: false });
         }
     }),
+    getSinglePrescription: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const { prescriptionId } = req.query;
+        try {
+            const prescription = yield database_1.Prescription.findById(prescriptionId);
+            if (!prescription) {
+                return res
+                    .status(404)
+                    .json({ message: 'Invalid Prescription', success: false });
+            }
+            return res.status(200).json({ prescription, success: true });
+        }
+        catch (error) {
+            return res
+                .status(500)
+                .json({ message: 'An error occurred', success: false, error });
+        }
+    }),
 };
 exports.default = EmployeeController;
