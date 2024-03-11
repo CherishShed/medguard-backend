@@ -10,6 +10,7 @@ type userType = {
   dateOfBirth: string
   phoneNumber: string
   changedPassword: string
+  role: string
 }
 const authController = {
   isLoggedIn: async (req: Request, res: Response) => {
@@ -25,6 +26,7 @@ const authController = {
           dateOfBirth: user.dateOfBirth,
           phoneNumber: user.phoneNumber,
           changedPassword: user.changedPassword,
+          role: user.role,
         },
       })
     } else {

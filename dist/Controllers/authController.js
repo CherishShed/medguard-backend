@@ -29,6 +29,7 @@ const authController = {
                     dateOfBirth: user.dateOfBirth,
                     phoneNumber: user.phoneNumber,
                     changedPassword: user.changedPassword,
+                    role: user.role,
                 },
             });
         }
