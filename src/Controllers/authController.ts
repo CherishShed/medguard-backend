@@ -2,7 +2,9 @@ import { Request, Response } from 'express'
 import { hash, compare } from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { HealthWorker } from '../Model/database'
-type userType = {
+import { ObjectId } from 'mongoose'
+export type userType = {
+  _id: ObjectId
   employeeNumber: string
   firstName: string
   lastName: string
@@ -15,7 +17,8 @@ type userType = {
 const authController = {
   isLoggedIn: async (req: Request, res: Response) => {
     if (req.user) {
-      const user = (req.user as userType[])[0]
+      console.log((req.user as userType)._id)
+      const user = req.user as userType
       return res.status(200).json({
         auth: true,
         user: {

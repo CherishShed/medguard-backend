@@ -176,7 +176,12 @@ const EmployeeController = {
         const { prescriptionId } = req.query;
         const medData = req.body;
         try {
-            const updatedPrescription = yield database_1.Prescription.findOneAndUpdate({ id: prescriptionId }, { $push: { drugs: medData } });
+            const updatedPrescription = yield database_1.Prescription.findOneAndUpdate({ id: prescriptionId }, {
+                $push: { drugs: medData },
+                $set: {
+                    lastUpdatedBy: req.user._id,
+                },
+            });
             if (!updatedPrescription) {
                 return res
                     .status(404)
@@ -185,6 +190,11 @@ const EmployeeController = {
             if (new Date(medData.end_date) > new Date(Date.now())) {
                 updatedPrescription.active = true;
             }
+            const foundPatient = yield database_1.Patient.findOne({
+                hospitalNumber: updatedPrescription.patient,
+            }, { lastUpdatedBy: 1 });
+            foundPatient.lastUpdatedBy = req.user._id;
+            foundPatient.save();
             return res
                 .status(200)
                 .json({ message: 'Added Medication Successfully', success: true });
@@ -202,7 +212,13 @@ const EmployeeController = {
                 prescriptionDate,
                 drugs,
                 patient: hospitalNumber,
+                lastUpdatedBy: req.user._id,
             });
+            const foundPatient = yield database_1.Patient.findOne({
+                hospitalNumber: hospitalNumber,
+            }, { lastUpdatedBy: 1 });
+            foundPatient.lastUpdatedBy = req.user._id;
+            foundPatient.save();
             yield newPrescription.save();
             res.status(201).json({
                 message: 'Prescription created successfully',

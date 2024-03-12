@@ -11,7 +11,7 @@ passport.use(
     },
     async (jwtPayload, done) => {
       try {
-        const user = await HealthWorker.find({
+        const user = await HealthWorker.findOne({
           employeeNumber: jwtPayload.employeeNumber,
         })
 

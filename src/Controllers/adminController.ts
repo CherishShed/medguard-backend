@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { Patient, Prescription } from '../Model/database'
+import { userType } from './authController'
 const EmployeeController = {
   getPatientInfo: async (req: Request, res: Response) => {
     const { hospitalNumber } = req.query
@@ -189,7 +190,13 @@ const EmployeeController = {
     try {
       const updatedPrescription = await Prescription.findOneAndUpdate(
         { id: prescriptionId }, // Find the prescription by its ID
-        { $push: { drugs: medData } } // Push the new medication into the drugs array
+        {
+          $push: { drugs: medData },
+          $set: {
+            lastUpdatedBy: (req.user as userType)._id,
+          },
+        }
+        // Push the new medication into the drugs array
       )
 
       if (!updatedPrescription) {
@@ -200,6 +207,14 @@ const EmployeeController = {
       if (new Date(medData.end_date) > new Date(Date.now())) {
         updatedPrescription.active = true
       }
+      const foundPatient = await Patient.findOne(
+        {
+          hospitalNumber: updatedPrescription.patient,
+        },
+        { lastUpdatedBy: 1 }
+      )
+      foundPatient!.lastUpdatedBy = (req.user as userType)._id
+      foundPatient!.save()
       return res
         .status(200)
         .json({ message: 'Added Medication Successfully', success: true })
@@ -217,8 +232,16 @@ const EmployeeController = {
         prescriptionDate,
         drugs,
         patient: hospitalNumber,
+        lastUpdatedBy: (req.user as userType)._id,
       })
-
+      const foundPatient = await Patient.findOne(
+        {
+          hospitalNumber: hospitalNumber,
+        },
+        { lastUpdatedBy: 1 }
+      )
+      foundPatient!.lastUpdatedBy = (req.user as userType)._id
+      foundPatient!.save()
       // Save the new prescription to the database
       await newPrescription.save()
 

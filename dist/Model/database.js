@@ -74,6 +74,10 @@ const prescriptionSchema = new mongoose_1.default.Schema({
         ref: 'Patient',
     },
     active: { type: Boolean, default: true },
+    lastUpdatedBy: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: 'HealthWorker',
+    },
 }, { timestamps: true });
 const vitalSchema = new mongoose_1.default.Schema({
     blood_pressure: { type: String },

@@ -75,6 +75,7 @@ export interface PrescriptionType extends Document {
   drugs: Array<IMedication[]>
   patient: string
   active: boolean
+  lastUpdatedBy: ObjectId
 }
 const employeeSchema = new mongoose.Schema<EmployeeType>({
   employeeNumber: { type: String },
@@ -114,6 +115,10 @@ const prescriptionSchema = new mongoose.Schema<PrescriptionType>(
       ref: 'Patient',
     },
     active: { type: Boolean, default: true },
+    lastUpdatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'HealthWorker',
+    },
   },
   { timestamps: true }
 )
