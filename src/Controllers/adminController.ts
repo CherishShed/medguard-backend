@@ -290,7 +290,12 @@ const EmployeeController = {
   getSinglePrescription: async (req: Request, res: Response) => {
     const { prescriptionId } = req.query
     try {
-      const prescription = await Prescription.findById(prescriptionId)
+      const prescription = await Prescription.findById(prescriptionId).populate(
+        {
+          path: 'lastUpdatedBy',
+          select: 'firstName lastName -_id', // Select only firstName and lastName fields
+        }
+      )
       if (!prescription) {
         return res
           .status(404)

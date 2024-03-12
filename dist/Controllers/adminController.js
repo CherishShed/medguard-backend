@@ -264,7 +264,10 @@ const EmployeeController = {
     getSinglePrescription: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { prescriptionId } = req.query;
         try {
-            const prescription = yield database_1.Prescription.findById(prescriptionId);
+            const prescription = yield database_1.Prescription.findById(prescriptionId).populate({
+                path: 'lastUpdatedBy',
+                select: 'firstName lastName -_id',
+            });
             if (!prescription) {
                 return res
                     .status(404)
