@@ -95,6 +95,34 @@ export const medicationReminder = async () => {
             console.error(err)
           })
       }
+      // async function sendTermiiSMS() {
+      //   const data = {
+      //     to,
+      //     from: 'MedGuard',
+      //     sms: text,
+      //     type: 'plain',
+      //     api_key: process.env.TERMII_API_KEY,
+      //     channel: 'generic',
+      //   }
+      //   const options = {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify(data),
+      //   }
+      //   fetch('https://api.ng.termii.com/api/sms/send', options)
+      //     .then(response => response.json())
+      //     .then(data => {
+      //       console.log('sent message sucessfuly')
+      //       console.log('Response:', data)
+      //     })
+      //     .catch(error => {
+      //       console.log('An error occured')
+      //       console.error('Error:', error)
+      //     })
+      // }
+      // sendTermiiSMS()
       sendSMS()
     }
   })
