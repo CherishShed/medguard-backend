@@ -8,12 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.medicationReminder = exports.updatePrescriptions = void 0;
-const smsMiddleware_1 = __importDefault(require("../Middlewares/smsMiddleware"));
+exports.sendSMS = exports.medicationReminder = exports.updatePrescriptions = void 0;
 const database_1 = require("../Model/database");
 require("dotenv/config");
 const updatePrescriptions = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -49,7 +45,6 @@ const updatePrescriptions = () => __awaiter(void 0, void 0, void 0, function* ()
 exports.updatePrescriptions = updatePrescriptions;
 const medicationReminder = () => __awaiter(void 0, void 0, void 0, function* () {
     const prescriptions = yield database_1.Prescription.find({ active: true }, { active: 1, patient: 1, drugs: 1 });
-    const from = process.env.VONAGE_VIRTUAL_NUMBER;
     prescriptions.forEach((prescription) => __awaiter(void 0, void 0, void 0, function* () {
         const foundPatient = yield database_1.Patient.findOne({ hospitalNumber: prescription.patient }, { phone_number: 1, firstName: 1 });
         if (foundPatient) {
@@ -83,22 +78,41 @@ const medicationReminder = () => __awaiter(void 0, void 0, void 0, function* () 
                     text += drugDetails;
                 }
             });
-            function sendSMS() {
-                return __awaiter(this, void 0, void 0, function* () {
-                    yield smsMiddleware_1.default.sms
-                        .send({ to, from, text, title: 'Medguard' })
-                        .then(resp => {
-                        console.log('Message sent successfully');
-                        console.log(resp);
-                    })
-                        .catch(err => {
-                        console.log('There was an error sending the messages.');
-                        console.error(err);
-                    });
-                });
-            }
-            sendSMS();
+            sendSMS(to, text);
         }
     }));
 });
 exports.medicationReminder = medicationReminder;
+function sendSMS(to, text) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const url = 'https://my.kudisms.net/api/sms';
+        const token = process.env.KUDI_SMS_TOKEN;
+        const senderID = process.env.KUDI_SMS_SENDER_ID;
+        const recipients = to;
+        const message = text;
+        const gateway = '2';
+        const queryParams = new URLSearchParams({
+            token,
+            senderID,
+            recipients,
+            message,
+            gateway,
+        });
+        fetch(`${url}?${queryParams}`, { method: 'GET' })
+            .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+            .then(data => {
+            console.log('Sent message sucesfully');
+            console.log('Response:', data);
+        })
+            .catch(error => {
+            console.log('An error occured');
+            console.error('Error:', error.message);
+        });
+    });
+}
+exports.sendSMS = sendSMS;

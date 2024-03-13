@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { Patient, Prescription } from '../Model/database'
-import vonage from '../Middlewares/smsMiddleware'
+import { sendSMS } from '../Utils/helperFunctions'
 
 const patientController = {
   getPatientInfo: async (req: Request, res: Response) => {
@@ -104,23 +104,11 @@ const patientController = {
         }
         foundPatient.status = status
         foundPatient.save()
-        const from = process.env.VONAGE_VIRTUAL_NUMBER as string
         const to = foundPatient.phone_number
         const text = `Dear ${foundPatient.firstName}, your Vitals do not look good please visit the hospital as soon as possible.\nBlood pressure: ${latestBlood_pressure}mmHg\nHeartbeat: ${latestHeart_beat}bpm\nBlood Oxygen: ${latestBlood_oxygen}%\n`
-        async function sendSMS() {
-          await vonage.sms
-            .send({ to, from, text, title: 'Medguard' })
-            .then(resp => {
-              console.log('Message sent successfully')
-              console.log(resp)
-            })
-            .catch(err => {
-              console.log('There was an error sending the messages.')
-              console.error(err)
-            })
-        }
+
         if (status === 'bad' || 'abnormal') {
-          sendSMS()
+          sendSMS(to, text)
         }
 
         return res.status(200).json({ Success: true, message: 'Success' })

@@ -1,4 +1,3 @@
-import vonage from '../Middlewares/smsMiddleware'
 import { Patient, Prescription } from '../Model/database'
 import 'dotenv/config'
 export const updatePrescriptions = async () => {
@@ -45,7 +44,6 @@ export const medicationReminder = async () => {
     { active: true },
     { active: 1, patient: 1, drugs: 1 }
   )
-  const from = process.env.VONAGE_VIRTUAL_NUMBER as string
   prescriptions.forEach(async prescription => {
     const foundPatient = await Patient.findOne(
       { hospitalNumber: prescription.patient },
@@ -83,47 +81,39 @@ export const medicationReminder = async () => {
           text += drugDetails
         }
       })
-      async function sendSMS() {
-        await vonage.sms
-          .send({ to, from, text, title: 'Medguard' })
-          .then(resp => {
-            console.log('Message sent successfully')
-            console.log(resp)
-          })
-          .catch(err => {
-            console.log('There was an error sending the messages.')
-            console.error(err)
-          })
-      }
-      // async function sendTermiiSMS() {
-      //   const data = {
-      //     to,
-      //     from: 'MedGuard',
-      //     sms: text,
-      //     type: 'plain',
-      //     api_key: process.env.TERMII_API_KEY,
-      //     channel: 'generic',
-      //   }
-      //   const options = {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify(data),
-      //   }
-      //   fetch('https://api.ng.termii.com/api/sms/send', options)
-      //     .then(response => response.json())
-      //     .then(data => {
-      //       console.log('sent message sucessfuly')
-      //       console.log('Response:', data)
-      //     })
-      //     .catch(error => {
-      //       console.log('An error occured')
-      //       console.error('Error:', error)
-      //     })
-      // }
-      // sendTermiiSMS()
-      sendSMS()
+      sendSMS(to, text)
     }
   })
+}
+
+export async function sendSMS(to: string, text: string) {
+  const url = 'https://my.kudisms.net/api/sms'
+  const token = process.env.KUDI_SMS_TOKEN as string
+  const senderID = process.env.KUDI_SMS_SENDER_ID as string
+  const recipients = to
+  const message = text
+  const gateway = '2'
+  const queryParams = new URLSearchParams({
+    token,
+    senderID,
+    recipients,
+    message,
+    gateway,
+  })
+
+  fetch(`${url}?${queryParams}`, { method: 'GET' })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+      return response.json()
+    })
+    .then(data => {
+      console.log('Sent message sucesfully')
+      console.log('Response:', data)
+    })
+    .catch(error => {
+      console.log('An error occured')
+      console.error('Error:', error.message)
+    })
 }
