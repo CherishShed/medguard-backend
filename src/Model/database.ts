@@ -1,7 +1,10 @@
-import mongoose, { Date, Document, ObjectId } from 'mongoose'
+import mongoose, { Document, ObjectId } from 'mongoose'
 import 'dotenv/config'
 import cron from 'node-cron'
-import { updatePrescriptions } from '../Utils/helperFunctions'
+import {
+  updatePrescriptions,
+  medicationReminder,
+} from '../Utils/helperFunctions'
 
 mongoose.set('strictQuery', true)
 export const connectToDatabase = async () => {
@@ -14,6 +17,10 @@ export const connectToDatabase = async () => {
       cron.schedule('0 0 * * *', () => {
         console.log('Running job...')
         updatePrescriptions()
+      })
+      cron.schedule('0 3 * * *', () => {
+        console.log('Running medicationReminder...')
+        medicationReminder()
       })
     })
     .catch(err => {
@@ -55,8 +62,8 @@ interface IMedication {
   afternoon: { amount: number; time: string }
   night: { amount: number; time: string }
   type: string
-  start_date: Date
-  end_date: Date
+  start_date: string
+  end_date: string
 }
 export interface EmployeeType extends Document {
   employeeNumber: string
@@ -72,7 +79,7 @@ export interface EmployeeType extends Document {
 }
 export interface PrescriptionType extends Document {
   prescriptionDate: string
-  drugs: Array<IMedication[]>
+  drugs: IMedication[]
   patient: string
   active: boolean
   lastUpdatedBy: ObjectId
@@ -102,8 +109,8 @@ const medicationSchema = new mongoose.Schema<IMedication>({
   afternoon: { type: { amount: Number, time: String } },
   night: { type: { amount: Number, time: String } },
   type: { type: String },
-  start_date: { type: String, default: Date.now().toString() },
-  end_date: { type: String, default: Date.now().toString() },
+  start_date: { type: String },
+  end_date: { type: String },
 })
 
 const prescriptionSchema = new mongoose.Schema<PrescriptionType>(

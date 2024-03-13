@@ -32,8 +32,12 @@ const patientController = {
     }
   },
   addVitals: async (req: Request, res: Response) => {
-    const { hospitalNumber, blood_pressure, heart_beat, blood_oxygen } =
-      req.query
+    const vitals: {
+      blood_pressure: string
+      heart_beat: string
+      blood_oxygen: string
+    }[] = req.body
+    const { hospitalNumber } = req.query
     try {
       const foundPatient = await Patient.findOne(
         {
@@ -48,18 +52,20 @@ const patientController = {
           latestVitals: 1,
         }
       )
+      const typedVitals = vitals.map(reading => ({
+        blood_oxygen: parseInt(reading.blood_oxygen),
+        blood_pressure: reading.blood_pressure,
+        heart_beat: parseInt(reading.heart_beat),
+      }))
       if (foundPatient) {
-        foundPatient.vitals.push({
-          blood_oxygen: parseInt(blood_oxygen as string),
-          blood_pressure: blood_pressure as string,
-          heart_beat: parseInt(heart_beat as string),
-        })
-        foundPatient.latestVitals = {
-          blood_oxygen: parseInt(blood_oxygen as string),
-          blood_pressure: blood_pressure as string,
-          heart_beat: parseInt(heart_beat as string),
-        }
-        const [systolic, diastolic] = (blood_pressure as string)
+        foundPatient.vitals.push(...typedVitals)
+        foundPatient.latestVitals = typedVitals[typedVitals.length - 1]
+        const latestBlood_pressure =
+          typedVitals[typedVitals.length - 1].blood_pressure
+        const latestHeart_beat = typedVitals[typedVitals.length - 1].heart_beat
+        const latestBlood_oxygen =
+          typedVitals[typedVitals.length - 1].blood_oxygen
+        const [systolic, diastolic] = (latestBlood_pressure as string)
           .split('/')
           .map(Number)
         let status = 'good'
@@ -77,16 +83,20 @@ const patientController = {
         }
 
         // Check heart rate
-        if (
-          parseInt(heart_beat as string) < 60 ||
-          parseInt(heart_beat as string) > 100
-        ) {
+        if (latestHeart_beat < 60 || latestHeart_beat > 100) {
           // Abnormal heart rate
           status = 'bad'
-        } else if (
-          parseInt(heart_beat as string) < 70 ||
-          parseInt(heart_beat as string) > 90
-        ) {
+        } else if (latestHeart_beat < 70 || latestHeart_beat > 90) {
+          // Warning for heart rate
+          if (status !== 'bad') {
+            status = 'abnormal'
+          }
+        }
+
+        if (latestBlood_oxygen < 90) {
+          // Abnormal heart rate
+          status = 'bad'
+        } else if (latestBlood_oxygen < 95) {
           // Warning for heart rate
           if (status !== 'bad') {
             status = 'abnormal'
@@ -96,7 +106,7 @@ const patientController = {
         foundPatient.save()
         const from = process.env.VONAGE_VIRTUAL_NUMBER as string
         const to = foundPatient.phone_number
-        const text = `Dear ${foundPatient.firstName}, your Vitals do not look good please visit the hospital as soon as possible.\nBlood pressure: ${blood_pressure}mmHg\nHeartbeat: ${heart_beat}bpm\n`
+        const text = `Dear ${foundPatient.firstName}, your Vitals do not look good please visit the hospital as soon as possible.\nBlood pressure: ${latestBlood_pressure}mmHg\nHeartbeat: ${latestHeart_beat}bpm\nBlood Oxygen: ${latestBlood_oxygen}%\n`
         async function sendSMS() {
           await vonage.sms
             .send({ to, from, text, title: 'Medguard' })
@@ -141,5 +151,4 @@ const patientController = {
     }
   },
 }
-
 export default patientController

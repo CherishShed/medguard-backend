@@ -29,6 +29,10 @@ const connectToDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
             console.log('Running job...');
             (0, helperFunctions_1.updatePrescriptions)();
         });
+        node_cron_1.default.schedule('0 3 * * *', () => {
+            console.log('Running medicationReminder...');
+            (0, helperFunctions_1.medicationReminder)();
+        });
     })
         .catch(err => {
         console.log(`An error occurred connecting to database: ${err}`);
@@ -63,8 +67,8 @@ const medicationSchema = new mongoose_1.default.Schema({
     afternoon: { type: { amount: Number, time: String } },
     night: { type: { amount: Number, time: String } },
     type: { type: String },
-    start_date: { type: String, default: Date.now().toString() },
-    end_date: { type: String, default: Date.now().toString() },
+    start_date: { type: String },
+    end_date: { type: String },
 });
 const prescriptionSchema = new mongoose_1.default.Schema({
     prescriptionDate: { type: String },

@@ -17,7 +17,6 @@ export type userType = {
 const authController = {
   isLoggedIn: async (req: Request, res: Response) => {
     if (req.user) {
-      console.log((req.user as userType)._id)
       const user = req.user as userType
       return res.status(200).json({
         auth: true,

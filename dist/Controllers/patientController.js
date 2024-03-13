@@ -43,7 +43,8 @@ const patientController = {
         }
     }),
     addVitals: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const { hospitalNumber, blood_pressure, heart_beat, blood_oxygen } = req.query;
+        const vitals = req.body;
+        const { hospitalNumber } = req.query;
         try {
             const foundPatient = yield database_1.Patient.findOne({
                 hospitalNumber: hospitalNumber,
@@ -55,18 +56,18 @@ const patientController = {
                 status: 1,
                 latestVitals: 1,
             });
+            const typedVitals = vitals.map(reading => ({
+                blood_oxygen: parseInt(reading.blood_oxygen),
+                blood_pressure: reading.blood_pressure,
+                heart_beat: parseInt(reading.heart_beat),
+            }));
             if (foundPatient) {
-                foundPatient.vitals.push({
-                    blood_oxygen: parseInt(blood_oxygen),
-                    blood_pressure: blood_pressure,
-                    heart_beat: parseInt(heart_beat),
-                });
-                foundPatient.latestVitals = {
-                    blood_oxygen: parseInt(blood_oxygen),
-                    blood_pressure: blood_pressure,
-                    heart_beat: parseInt(heart_beat),
-                };
-                const [systolic, diastolic] = blood_pressure
+                foundPatient.vitals.push(...typedVitals);
+                foundPatient.latestVitals = typedVitals[typedVitals.length - 1];
+                const latestBlood_pressure = typedVitals[typedVitals.length - 1].blood_pressure;
+                const latestHeart_beat = typedVitals[typedVitals.length - 1].heart_beat;
+                const latestBlood_oxygen = typedVitals[typedVitals.length - 1].blood_oxygen;
+                const [systolic, diastolic] = latestBlood_pressure
                     .split('/')
                     .map(Number);
                 let status = 'good';
@@ -79,12 +80,18 @@ const patientController = {
                 else if (systolic < 120 || diastolic < 80) {
                     status = 'abnormal';
                 }
-                if (parseInt(heart_beat) < 60 ||
-                    parseInt(heart_beat) > 100) {
+                if (latestHeart_beat < 60 || latestHeart_beat > 100) {
                     status = 'bad';
                 }
-                else if (parseInt(heart_beat) < 70 ||
-                    parseInt(heart_beat) > 90) {
+                else if (latestHeart_beat < 70 || latestHeart_beat > 90) {
+                    if (status !== 'bad') {
+                        status = 'abnormal';
+                    }
+                }
+                if (latestBlood_oxygen < 90) {
+                    status = 'bad';
+                }
+                else if (latestBlood_oxygen < 95) {
                     if (status !== 'bad') {
                         status = 'abnormal';
                     }
@@ -93,7 +100,7 @@ const patientController = {
                 foundPatient.save();
                 const from = process.env.VONAGE_VIRTUAL_NUMBER;
                 const to = foundPatient.phone_number;
-                const text = `Dear ${foundPatient.firstName}, your Vitals do not look good please visit the hospital as soon as possible.\nBlood pressure: ${blood_pressure}mmHg\nHeartbeat: ${heart_beat}bpm\n`;
+                const text = `Dear ${foundPatient.firstName}, your Vitals do not look good please visit the hospital as soon as possible.\nBlood pressure: ${latestBlood_pressure}mmHg\nHeartbeat: ${latestHeart_beat}bpm\nBlood Oxygen: ${latestBlood_oxygen}%\n`;
                 function sendSMS() {
                     return __awaiter(this, void 0, void 0, function* () {
                         yield smsMiddleware_1.default.sms
