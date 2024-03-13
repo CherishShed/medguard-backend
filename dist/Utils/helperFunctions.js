@@ -110,7 +110,7 @@ function sendSMS(to, text) {
             console.log('Response:', data);
         })
             .catch(error => {
-            console.log('An error occured');
+            console.log('An error occured while sending message');
             console.error('Error:', error.message);
         });
     });
