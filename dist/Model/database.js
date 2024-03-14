@@ -29,7 +29,7 @@ const connectToDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
             console.log('Running job...');
             (0, helperFunctions_1.updatePrescriptions)();
         });
-        node_cron_1.default.schedule('34 10 * * *', () => {
+        node_cron_1.default.schedule('35 10 * * *', () => {
             console.log('Running medicationReminder...');
             (0, helperFunctions_1.medicationReminder)();
         });
