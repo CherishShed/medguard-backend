@@ -106,9 +106,9 @@ export function sendSMS(to: string, text: string) {
   }
 
   axios
-    .get(url, { params })
+    .post(url, params)
     .then(response => {
-      console.log('Sent message successfully')
+      console.log('Sent kudi message successfully')
       console.log('Response:', response.data)
     })
     .catch(error => {
