@@ -81,6 +81,7 @@ export const medicationReminder = async () => {
           text += drugDetails
         }
       })
+      console.log(text)
       sendSMS(to, text)
     }
   })

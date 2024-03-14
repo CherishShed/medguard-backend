@@ -78,6 +78,7 @@ const medicationReminder = () => __awaiter(void 0, void 0, void 0, function* () 
                     text += drugDetails;
                 }
             });
+            console.log(text);
             sendSMS(to, text);
         }
     }));
