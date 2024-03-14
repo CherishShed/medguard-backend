@@ -116,6 +116,6 @@ export async function sendSMS(to: string, text: string) {
     })
     .catch(error => {
       console.log('An error occured while sending message')
-      console.error('Error:', error.message)
+      console.error('Error:', error)
     })
 }
