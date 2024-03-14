@@ -55,6 +55,7 @@ export const medicationReminder = async () => {
       let text = `Dear ${foundPatient.firstName}, these are your drugs for the day.\n`
       prescription.drugs.forEach(drug => {
         if (new Date(drug.end_date) >= new Date()) {
+          console.log(drug)
           let drugNoun = 'dose'
           if (drug.type.toLowerCase() === 'injection') {
             drugNoun = 'mg'
