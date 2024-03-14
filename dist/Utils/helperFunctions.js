@@ -49,7 +49,6 @@ const updatePrescriptions = () => __awaiter(void 0, void 0, void 0, function* ()
 exports.updatePrescriptions = updatePrescriptions;
 const medicationReminder = () => __awaiter(void 0, void 0, void 0, function* () {
     const prescriptions = yield database_1.Prescription.find({ active: true }, { active: 1, patient: 1, drugs: 1 });
-    console.log('inside here');
     prescriptions.forEach((prescription) => __awaiter(void 0, void 0, void 0, function* () {
         const foundPatient = yield database_1.Patient.findOne({ hospitalNumber: prescription.patient }, { phone_number: 1, firstName: 1 });
         if (foundPatient) {
@@ -83,7 +82,6 @@ const medicationReminder = () => __awaiter(void 0, void 0, void 0, function* () 
                     text += drugDetails;
                 }
             });
-            console.log(text);
             sendSMS(to, text);
         }
     }));
@@ -106,12 +104,10 @@ function sendSMS(to, text) {
     axios_1.default
         .post(url, params)
         .then(response => {
-        console.log('Sent kudi message successfully');
-        console.log('Response:', response.data);
+        console.log('Sent kudi message successfully\n Response:', response.data);
     })
         .catch(error => {
-        console.error('An error occurred while sending message');
-        console.error('Error:', error);
+        console.error('An error occurred while sending message\nError:', error);
     });
 }
 exports.sendSMS = sendSMS;

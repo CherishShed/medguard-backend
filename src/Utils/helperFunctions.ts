@@ -45,7 +45,6 @@ export const medicationReminder = async () => {
     { active: true },
     { active: 1, patient: 1, drugs: 1 }
   )
-  console.log('inside here')
   prescriptions.forEach(async prescription => {
     const foundPatient = await Patient.findOne(
       { hospitalNumber: prescription.patient },
@@ -83,7 +82,6 @@ export const medicationReminder = async () => {
           text += drugDetails
         }
       })
-      console.log(text)
       sendSMS(to, text)
     }
   })
@@ -108,11 +106,9 @@ export function sendSMS(to: string, text: string) {
   axios
     .post(url, params)
     .then(response => {
-      console.log('Sent kudi message successfully')
-      console.log('Response:', response.data)
+      console.log('Sent kudi message successfully\n Response:', response.data)
     })
     .catch(error => {
-      console.error('An error occurred while sending message')
-      console.error('Error:', error)
+      console.error('An error occurred while sending message\nError:', error)
     })
 }
