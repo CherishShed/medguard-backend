@@ -25,7 +25,7 @@ const connectToDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     })
         .then(() => {
         console.log('Database Connection Succeeded');
-        node_cron_1.default.schedule('0 0 * * *', () => {
+        node_cron_1.default.schedule('41 11 * * *', () => {
             console.log('Running job...');
             (0, helperFunctions_1.updatePrescriptions)();
         });

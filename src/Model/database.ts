@@ -14,7 +14,7 @@ export const connectToDatabase = async () => {
     })
     .then(() => {
       console.log('Database Connection Succeeded')
-      cron.schedule('0 0 * * *', () => {
+      cron.schedule('41 11 * * *', () => {
         console.log('Running job...')
         updatePrescriptions()
       })
