@@ -1,5 +1,6 @@
 import { Patient, Prescription } from '../Model/database'
 import 'dotenv/config'
+import axios from 'axios'
 export const updatePrescriptions = async () => {
   // const currentDate = new Date()
   Prescription.updateMany(
@@ -44,6 +45,7 @@ export const medicationReminder = async () => {
     { active: true },
     { active: 1, patient: 1, drugs: 1 }
   )
+  console.log('inside here')
   prescriptions.forEach(async prescription => {
     const foundPatient = await Patient.findOne(
       { hospitalNumber: prescription.patient },
@@ -84,44 +86,34 @@ export const medicationReminder = async () => {
       })
       console.log(text)
       sendSMS(to, text)
-        .then(result => {
-          console.log('correct: ', result)
-        })
-        .catch(err => {
-          console.log('an error occured: ', err)
-        })
     }
   })
 }
 
-export async function sendSMS(to: string, text: string) {
+export function sendSMS(to: string, text: string) {
   const url = 'https://my.kudisms.net/api/sms'
-  const token = process.env.KUDI_SMS_TOKEN as string
-  const senderID = process.env.KUDI_SMS_SENDER_ID as string
+  const token = process.env.KUDI_SMS_TOKEN
+  const senderID = process.env.KUDI_SMS_SENDER_ID
   const recipients = to
   const message = text
   const gateway = '2'
-  const queryParams = new URLSearchParams({
+
+  const params = {
     token,
     senderID,
     recipients,
     message,
     gateway,
-  })
+  }
 
-  fetch(`${url}?${queryParams}`, { method: 'GET' })
+  axios
+    .get(url, { params })
     .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok')
-      }
-      return response.json()
-    })
-    .then(data => {
-      console.log('Sent message sucesfully')
-      console.log('Response:', data)
+      console.log('Sent message successfully')
+      console.log('Response:', response.data)
     })
     .catch(error => {
-      console.log('An error occured while sending message')
+      console.error('An error occurred while sending message')
       console.error('Error:', error)
     })
 }

@@ -8,10 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendSMS = exports.medicationReminder = exports.updatePrescriptions = void 0;
 const database_1 = require("../Model/database");
 require("dotenv/config");
+const axios_1 = __importDefault(require("axios"));
 const updatePrescriptions = () => __awaiter(void 0, void 0, void 0, function* () {
     database_1.Prescription.updateMany({
         $or: [
@@ -45,6 +49,7 @@ const updatePrescriptions = () => __awaiter(void 0, void 0, void 0, function* ()
 exports.updatePrescriptions = updatePrescriptions;
 const medicationReminder = () => __awaiter(void 0, void 0, void 0, function* () {
     const prescriptions = yield database_1.Prescription.find({ active: true }, { active: 1, patient: 1, drugs: 1 });
+    console.log('inside here');
     prescriptions.forEach((prescription) => __awaiter(void 0, void 0, void 0, function* () {
         const foundPatient = yield database_1.Patient.findOne({ hospitalNumber: prescription.patient }, { phone_number: 1, firstName: 1 });
         if (foundPatient) {
@@ -80,47 +85,34 @@ const medicationReminder = () => __awaiter(void 0, void 0, void 0, function* () 
                 }
             });
             console.log(text);
-            sendSMS(to, text)
-                .then(result => {
-                console.log('correct: ', result);
-            })
-                .catch(err => {
-                console.log('an error occured: ', err);
-            });
+            sendSMS(to, text);
         }
     }));
 });
 exports.medicationReminder = medicationReminder;
 function sendSMS(to, text) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const url = 'https://my.kudisms.net/api/sms';
-        const token = process.env.KUDI_SMS_TOKEN;
-        const senderID = process.env.KUDI_SMS_SENDER_ID;
-        const recipients = to;
-        const message = text;
-        const gateway = '2';
-        const queryParams = new URLSearchParams({
-            token,
-            senderID,
-            recipients,
-            message,
-            gateway,
-        });
-        fetch(`${url}?${queryParams}`, { method: 'GET' })
-            .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-            .then(data => {
-            console.log('Sent message sucesfully');
-            console.log('Response:', data);
-        })
-            .catch(error => {
-            console.log('An error occured while sending message');
-            console.error('Error:', error);
-        });
+    const url = 'https://my.kudisms.net/api/sms';
+    const token = process.env.KUDI_SMS_TOKEN;
+    const senderID = process.env.KUDI_SMS_SENDER_ID;
+    const recipients = to;
+    const message = text;
+    const gateway = '2';
+    const params = {
+        token,
+        senderID,
+        recipients,
+        message,
+        gateway,
+    };
+    axios_1.default
+        .get(url, { params })
+        .then(response => {
+        console.log('Sent message successfully');
+        console.log('Response:', response.data);
+    })
+        .catch(error => {
+        console.error('An error occurred while sending message');
+        console.error('Error:', error);
     });
 }
 exports.sendSMS = sendSMS;
