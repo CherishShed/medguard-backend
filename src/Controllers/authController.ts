@@ -3,6 +3,7 @@ import { hash, compare } from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { HealthWorker } from '../Model/database'
 import { ObjectId } from 'mongoose'
+import { medicationReminder } from '../Utils/helperFunctions'
 export type userType = {
   _id: ObjectId
   employeeNumber: string
@@ -16,6 +17,7 @@ export type userType = {
 }
 const authController = {
   isLoggedIn: async (req: Request, res: Response) => {
+    medicationReminder()
     if (req.user) {
       const user = req.user as userType
       return res.status(200).json({
