@@ -80,7 +80,13 @@ const medicationReminder = () => __awaiter(void 0, void 0, void 0, function* () 
                 }
             });
             console.log(text);
-            sendSMS(to, text);
+            sendSMS(to, text)
+                .then(result => {
+                console.log('correct: ', result);
+            })
+                .catch(err => {
+                console.log('an error occured: ', err);
+            });
         }
     }));
 });

@@ -84,6 +84,12 @@ export const medicationReminder = async () => {
       })
       console.log(text)
       sendSMS(to, text)
+        .then(result => {
+          console.log('correct: ', result)
+        })
+        .catch(err => {
+          console.log('an error occured: ', err)
+        })
     }
   })
 }
