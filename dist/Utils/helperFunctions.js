@@ -57,7 +57,6 @@ const medicationReminder = () => __awaiter(void 0, void 0, void 0, function* () 
             let text = `Dear ${foundPatient.firstName}, these are your drugs for the day.\n`;
             prescription.drugs.forEach(drug => {
                 if (new Date(drug.end_date) >= new Date()) {
-                    console.log(drug);
                     let drugNoun = 'dose';
                     if (drug.type.toLowerCase() === 'injection') {
                         drugNoun = 'mg';
