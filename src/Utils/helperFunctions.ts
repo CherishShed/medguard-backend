@@ -58,13 +58,13 @@ export const medicationReminder = async () => {
         if (new Date(drug.end_date) >= new Date()) {
           let drugNoun = 'dose'
           if (drug.type.toLowerCase() === 'injection') {
-            drugNoun = 'mg'
+            drugNoun = 'Mg'
           } else if (drug.type.toLowerCase() === 'syrup') {
-            drugNoun = 'ml'
+            drugNoun = 'Ml'
           } else if (drug.type.toLowerCase() === 'inhaler') {
-            drugNoun = 'puffs'
+            drugNoun = 'Puffs'
           } else if (drug.type.toLowerCase() === 'tablet') {
-            drugNoun = 'tablets'
+            drugNoun = 'Tablets'
           }
           const morningDrugDetails =
             drug.morning.amount > 0
