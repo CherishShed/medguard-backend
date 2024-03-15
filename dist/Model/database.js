@@ -22,6 +22,7 @@ const connectToDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     mongoose_1.default
         .connect(process.env.CONNECTION_STRING, {
         dbName: 'MedGuard',
+        connectTimeoutMS: 40000,
     })
         .then(() => {
         console.log('Database Connection Succeeded');

@@ -13,9 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendSMS = exports.medicationReminder = exports.updatePrescriptions = void 0;
+const axios_1 = __importDefault(require("axios"));
 const database_1 = require("../Model/database");
 require("dotenv/config");
-const axios_1 = __importDefault(require("axios"));
 const updatePrescriptions = () => __awaiter(void 0, void 0, void 0, function* () {
     database_1.Prescription.updateMany({
         $or: [
@@ -88,26 +88,28 @@ const medicationReminder = () => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.medicationReminder = medicationReminder;
 function sendSMS(to, text) {
+    console.log('trying to send');
     const url = 'https://my.kudisms.net/api/sms';
     const token = process.env.KUDI_SMS_TOKEN;
     const senderID = process.env.KUDI_SMS_SENDER_ID;
     const recipients = to;
     const message = text;
     const gateway = '2';
-    const params = {
+    const queryParams = new URLSearchParams({
         token,
         senderID,
         recipients,
         message,
         gateway,
-    };
+    });
     axios_1.default
-        .post(url, params)
+        .get(`${url}?${queryParams}`, { timeout: 40000 })
         .then(response => {
-        console.log('Sent kudi message successfully\n Response:', response.data);
+        console.log('Sent message sucesfully', response.data);
     })
         .catch(error => {
-        console.error('An error occurred while sending message\nError:', error);
+        console.log('An error occured while sending message\n', error.message);
     });
+    return;
 }
 exports.sendSMS = sendSMS;

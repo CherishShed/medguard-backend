@@ -11,6 +11,7 @@ export const connectToDatabase = async () => {
   mongoose
     .connect(process.env.CONNECTION_STRING! as string, {
       dbName: 'MedGuard',
+      connectTimeoutMS: 40000,
     })
     .then(() => {
       console.log('Database Connection Succeeded')

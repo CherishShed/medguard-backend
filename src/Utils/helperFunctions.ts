@@ -1,6 +1,6 @@
+import axios from 'axios'
 import { Patient, Prescription } from '../Model/database'
 import 'dotenv/config'
-import axios from 'axios'
 export const updatePrescriptions = async () => {
   // const currentDate = new Date()
   Prescription.updateMany(
@@ -88,27 +88,29 @@ export const medicationReminder = async () => {
 }
 
 export function sendSMS(to: string, text: string) {
+  console.log('trying to send')
   const url = 'https://my.kudisms.net/api/sms'
-  const token = process.env.KUDI_SMS_TOKEN
-  const senderID = process.env.KUDI_SMS_SENDER_ID
+  const token = process.env.KUDI_SMS_TOKEN as string
+  const senderID = process.env.KUDI_SMS_SENDER_ID as string
   const recipients = to
   const message = text
   const gateway = '2'
 
-  const params = {
+  const queryParams = new URLSearchParams({
     token,
     senderID,
     recipients,
     message,
     gateway,
-  }
+  })
 
   axios
-    .post(url, params)
+    .get(`${url}?${queryParams}`, { timeout: 40000 })
     .then(response => {
-      console.log('Sent kudi message successfully\n Response:', response.data)
+      console.log('Sent message sucesfully', response.data)
     })
     .catch(error => {
-      console.error('An error occurred while sending message\nError:', error)
+      console.log('An error occured while sending message\n', error.message)
     })
+  return
 }
