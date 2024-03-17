@@ -3,41 +3,35 @@ import { Patient, Prescription } from '../Model/database'
 import 'dotenv/config'
 export const updatePrescriptions = async () => {
   // const currentDate = new Date()
-  Prescription.updateMany(
-    {
-      $or: [
-        { 'drugs.end_date': { $gte: new Date() } },
-        { drugs: { $exists: false } },
-      ],
-    },
-    {
-      $set: { active: true },
-    }
-  )
-    .then(result => {
-      console.log(`${result.modifiedCount} documents updated.`)
-    })
-    .catch(error => {
-      console.error('Error updating documents:', error)
-    })
+  const currentDate = new Date()
+  const prescriptions = await Prescription.find()
+  prescriptions.map(prescription => {
+    const drugs = prescription.drugs
+    let active = false
+    for (const drug of drugs) {
+      const endDate = new Date(drug.end_date)
+      const endYear = endDate.getFullYear()
+      const endMonth = endDate.getMonth()
+      const endDay = endDate.getDate()
 
-  Prescription.updateMany(
-    {
-      $or: [
-        { 'drugs.end_date': { $lt: new Date() } },
-        { drugs: { $exists: false } },
-      ],
-    },
-    {
-      $set: { active: false },
+      // Extract year, month, and day from the current date
+      const currentYear = currentDate.getFullYear()
+      const currentMonth = currentDate.getMonth()
+      const currentDay = currentDate.getDate()
+      if (
+        endYear > currentYear ||
+        (endYear === currentYear && endMonth > currentMonth) ||
+        (endYear === currentYear &&
+          endMonth >= currentMonth &&
+          endDay >= currentDay)
+      ) {
+        active = true
+        break
+      }
     }
-  )
-    .then(result => {
-      console.log(`${result.modifiedCount} documents updated.`)
-    })
-    .catch(error => {
-      console.error('Error updating documents:', error)
-    })
+    prescription.active = active
+    prescription.save()
+  })
 }
 
 export const medicationReminder = async () => {

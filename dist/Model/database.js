@@ -26,11 +26,11 @@ const connectToDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     })
         .then(() => {
         console.log('Database Connection Succeeded');
-        node_cron_1.default.schedule('25 18 * * *', () => {
+        node_cron_1.default.schedule('0 0 * * *', () => {
             console.log('Running job...');
             (0, helperFunctions_1.updatePrescriptions)();
         });
-        node_cron_1.default.schedule('29 18 * * *', () => {
+        node_cron_1.default.schedule('0 3 * * *', () => {
             console.log('Running medicationReminder...');
             (0, helperFunctions_1.medicationReminder)();
         });

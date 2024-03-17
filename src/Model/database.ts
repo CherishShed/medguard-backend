@@ -15,11 +15,11 @@ export const connectToDatabase = async () => {
     })
     .then(() => {
       console.log('Database Connection Succeeded')
-      cron.schedule('25 18 * * *', () => {
+      cron.schedule('0 0 * * *', () => {
         console.log('Running job...')
         updatePrescriptions()
       })
-      cron.schedule('29 18 * * *', () => {
+      cron.schedule('0 3 * * *', () => {
         console.log('Running medicationReminder...')
         medicationReminder()
       })
