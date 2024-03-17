@@ -82,7 +82,12 @@ export const medicationReminder = async () => {
           text += drugDetails
         }
       })
-      sendSMS(to, text)
+      if (
+        text !==
+        `Dear ${foundPatient.firstName}, these are your drugs for the day.\n`
+      ) {
+        sendSMS(to, text)
+      }
     }
   })
 }
