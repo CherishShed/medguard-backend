@@ -106,7 +106,7 @@ function sendSMS(to, text) {
         gateway,
     });
     axios_1.default
-        .get(`${url}?${queryParams}`, { timeout: 40000 })
+        .get(`${url}?${queryParams}`, { timeout: 40000, maxBodyLength: Infinity })
         .then(response => {
         console.log('Sent message sucesfully', response.data);
     })

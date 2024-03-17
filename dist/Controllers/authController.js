@@ -15,10 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = require("bcrypt");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const database_1 = require("../Model/database");
-const helperFunctions_1 = require("../Utils/helperFunctions");
 const authController = {
     isLoggedIn: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        (0, helperFunctions_1.medicationReminder)();
         if (req.user) {
             const user = req.user;
             return res.status(200).json({
