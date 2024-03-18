@@ -46,7 +46,6 @@ export interface patientType extends Document {
   phone_number: string
   emergencyContact1: string
   emergencyContact2: string
-  prescriptions: Array<IMedication[]>
   vitals: IVital[]
   latestVitals: IVital
   lastUpdatedBy: ObjectId

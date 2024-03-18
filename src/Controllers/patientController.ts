@@ -48,6 +48,7 @@ const patientController = {
           phone_number: 1,
           hospitalNumber: 1,
           firstName: 1,
+          lastName: 1,
           status: 1,
           latestVitals: 1,
         }
@@ -106,9 +107,12 @@ const patientController = {
         foundPatient.save()
         const to = foundPatient.phone_number
         const text = `Dear ${foundPatient.firstName}, your Vitals do not look good please visit the hospital as soon as possible.\nBlood pressure: ${latestBlood_pressure}mmHg\nHeartbeat: ${latestHeart_beat}bpm\nBlood Oxygen: ${latestBlood_oxygen}%\n`
-
+        const hospitalText = `Alert!!!\nThe Vitals of this patient does not look good.\nHospital Number: ${foundPatient.hospitalNumber}\nName: ${foundPatient.firstName} ${foundPatient.lastName}.\nBlood pressure: ${latestBlood_pressure}mmHg\nHeartbeat: ${latestHeart_beat}bpm\nBlood Oxygen: ${latestBlood_oxygen}%\n`
         if (status === 'bad' || 'abnormal') {
           sendSMS(to, text)
+          setTimeout(() => {
+            sendSMS('2348152819194', hospitalText)
+          }, 3000)
         }
 
         return res.status(200).json({ Success: true, message: 'Success' })
