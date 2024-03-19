@@ -19,7 +19,7 @@ export const connectToDatabase = async () => {
         console.log('Running job...')
         updatePrescriptions()
       })
-      cron.schedule('0 3 * * *', () => {
+      cron.schedule('0 5 * * *', () => {
         console.log('Running medicationReminder...')
         medicationReminder()
       })
