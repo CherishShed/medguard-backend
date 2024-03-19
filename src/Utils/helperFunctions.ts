@@ -86,30 +86,57 @@ export const medicationReminder = async () => {
   })
 }
 
+// export function sendSMS(to: string, text: string) {
+//   console.log('trying to send')
+//   const url = 'https://my.kudisms.net/api/sms'
+//   const token = process.env.KUDI_SMS_TOKEN as string
+//   const senderID = process.env.KUDI_SMS_SENDER_ID as string
+//   const recipients = to
+//   const message = text
+//   const gateway = '2'
+
+//   const queryParams = new URLSearchParams({
+//     token,
+//     senderID,
+//     recipients,
+//     message,
+//     gateway,
+//   })
+
+//   axios
+//     .get(`${url}?${queryParams}`, { timeout: 40000, maxBodyLength: Infinity })
+//     .then(response => {
+//       console.log('Sent message sucesfully', response.data)
+//     })
+//     .catch(error => {
+//       console.log('An error occured while sending message\n', error.message)
+//     })
+//   return
+// }
+
 export function sendSMS(to: string, text: string) {
-  console.log('trying to send')
-  const url = 'https://my.kudisms.net/api/sms'
   const token = process.env.KUDI_SMS_TOKEN as string
   const senderID = process.env.KUDI_SMS_SENDER_ID as string
   const recipients = to
   const message = text
-  const gateway = '2'
+  const data = new FormData()
+  data.append('token', token)
+  data.append('senderID', senderID)
+  data.append('recipients', recipients)
+  data.append('message', message)
 
-  const queryParams = new URLSearchParams({
-    token,
-    senderID,
-    recipients,
-    message,
-    gateway,
-  })
+  const config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: 'https://my.kudisms.net/api/corporate',
+    data: data,
+  }
 
-  axios
-    .get(`${url}?${queryParams}`, { timeout: 40000, maxBodyLength: Infinity })
-    .then(response => {
-      console.log('Sent message sucesfully', response.data)
+  axios(config)
+    .then(function (response) {
+      console.log(JSON.stringify(response.data))
     })
-    .catch(error => {
-      console.log('An error occured while sending message\n', error.message)
+    .catch(function (error) {
+      console.log(error)
     })
-  return
 }

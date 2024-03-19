@@ -111,7 +111,7 @@ const patientController = {
         if (status === 'bad' || 'abnormal') {
           sendSMS(to, text)
           setTimeout(() => {
-            sendSMS('2348152819194', hospitalText)
+            sendSMS('2348140660980', hospitalText)
           }, 3000)
         }
 

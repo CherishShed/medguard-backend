@@ -88,28 +88,27 @@ const medicationReminder = () => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.medicationReminder = medicationReminder;
 function sendSMS(to, text) {
-    console.log('trying to send');
-    const url = 'https://my.kudisms.net/api/sms';
     const token = process.env.KUDI_SMS_TOKEN;
     const senderID = process.env.KUDI_SMS_SENDER_ID;
     const recipients = to;
     const message = text;
-    const gateway = '2';
-    const queryParams = new URLSearchParams({
-        token,
-        senderID,
-        recipients,
-        message,
-        gateway,
-    });
-    axios_1.default
-        .get(`${url}?${queryParams}`, { timeout: 40000, maxBodyLength: Infinity })
-        .then(response => {
-        console.log('Sent message sucesfully', response.data);
+    const data = new FormData();
+    data.append('token', token);
+    data.append('senderID', senderID);
+    data.append('recipients', recipients);
+    data.append('message', message);
+    const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'https://my.kudisms.net/api/corporate',
+        data: data,
+    };
+    (0, axios_1.default)(config)
+        .then(function (response) {
+        console.log(JSON.stringify(response.data));
     })
-        .catch(error => {
-        console.log('An error occured while sending message\n', error.message);
+        .catch(function (error) {
+        console.log(error);
     });
-    return;
 }
 exports.sendSMS = sendSMS;
