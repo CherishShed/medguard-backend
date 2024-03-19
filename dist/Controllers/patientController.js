@@ -102,7 +102,7 @@ const patientController = {
                 if (status === 'bad' || 'abnormal') {
                     (0, helperFunctions_1.sendSMS)(to, text);
                     setTimeout(() => {
-                        (0, helperFunctions_1.sendSMS)('2349060052211', hospitalText);
+                        (0, helperFunctions_1.sendSMS)('2349167648722', hospitalText);
                     }, 3000);
                 }
                 return res.status(200).json({ Success: true, message: 'Success' });
