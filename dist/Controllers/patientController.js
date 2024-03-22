@@ -54,22 +54,27 @@ const patientController = {
                 status: 1,
                 latestVitals: 1,
             });
-            const typedVitals = vitals.map(reading => ({
-                blood_oxygen: parseInt(reading.blood_oxygen),
-                blood_pressure: reading.blood_pressure,
-                heart_beat: parseInt(reading.heart_beat),
-            }));
+            const typedVitals = {
+                temperature: parseInt(vitals.temperature),
+                blood_oxygen: parseInt(vitals.blood_oxygen),
+                heart_beat: parseInt(vitals.heart_beat),
+                blood_pressure: vitals.blood_pressure,
+            };
             if (foundPatient) {
-                foundPatient.vitals.push(...typedVitals);
-                foundPatient.latestVitals = typedVitals[typedVitals.length - 1];
-                const latestBlood_pressure = typedVitals[typedVitals.length - 1].blood_pressure;
-                const latestHeart_beat = typedVitals[typedVitals.length - 1].heart_beat;
-                const latestBlood_oxygen = typedVitals[typedVitals.length - 1].blood_oxygen;
+                foundPatient.vitals.push(typedVitals);
+                foundPatient.latestVitals = typedVitals;
+                const latestBlood_pressure = typedVitals.blood_pressure;
+                const latestHeart_beat = typedVitals.heart_beat;
+                const latestBlood_oxygen = typedVitals.blood_oxygen;
+                const latestTemperature = typedVitals.temperature;
                 const [systolic, diastolic] = latestBlood_pressure
                     .split('/')
                     .map(Number);
                 let status = 'good';
-                if (systolic < 90 ||
+                if (systolic == 0 || diastolic == 0) {
+                    status = 'good';
+                }
+                else if (systolic < 90 ||
                     systolic > 140 ||
                     diastolic < 60 ||
                     diastolic > 90) {
@@ -94,12 +99,20 @@ const patientController = {
                         status = 'abnormal';
                     }
                 }
+                if (latestTemperature > 39 || latestTemperature < 34) {
+                    status = 'bad';
+                }
+                else if (latestTemperature > 37.2 || latestTemperature < 36) {
+                    if (status !== 'bad') {
+                        status = 'abnormal';
+                    }
+                }
                 foundPatient.status = status;
                 foundPatient.save();
                 const to = foundPatient.phone_number;
-                const text = `Dear ${foundPatient.firstName}, your Vitals do not look good please visit the hospital as soon as possible.\nBlood pressure: ${latestBlood_pressure}mmHg\nHeartbeat: ${latestHeart_beat}bpm\nBlood Oxygen: ${latestBlood_oxygen}%\n`;
-                const hospitalText = `Alert!!!\nThe Vitals of this patient do not look good.\nHospital Number: ${foundPatient.hospitalNumber}Name: ${foundPatient.firstName} ${foundPatient.lastName}.\n\nPhone Number: ${foundPatient.phone_number}\nBlood pressure: ${latestBlood_pressure}mmHg\nHeartbeat: ${latestHeart_beat}bpm\nBlood Oxygen: ${latestBlood_oxygen}%\n`;
-                if (status === 'bad' || 'abnormal') {
+                const text = `Dear ${foundPatient.firstName}, your Vitals do not look good please visit the hospital as soon as possible.\nTemperature: ${latestTemperature}°C\nHeartbeat: ${latestHeart_beat}bpm\nBlood Oxygen: ${latestBlood_oxygen}%\n`;
+                const hospitalText = `Alert!!!\nThe Vitals of this patient do not look good.\nHospital Number: ${foundPatient.hospitalNumber}Name: ${foundPatient.firstName} ${foundPatient.lastName}.\n\nPhone Number: ${foundPatient.phone_number}\nTemperature: ${latestTemperature}°C\nHeartbeat: ${latestHeart_beat}bpm\nBlood Oxygen: ${latestBlood_oxygen}%\n`;
+                if (status != 'good') {
                     (0, helperFunctions_1.sendSMS)(to, text);
                     setTimeout(() => {
                         (0, helperFunctions_1.sendSMS)('2349167648722', hospitalText);

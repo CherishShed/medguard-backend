@@ -88,6 +88,7 @@ const vitalSchema = new mongoose_1.default.Schema({
     blood_pressure: { type: String },
     heart_beat: { type: Number },
     blood_oxygen: { type: Number },
+    temperature: { type: Number },
 }, { timestamps: true });
 const patientSchema = new mongoose_1.default.Schema({
     hospitalNumber: { type: String, required: true, unique: true },

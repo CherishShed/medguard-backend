@@ -54,6 +54,7 @@ interface IVital {
   blood_pressure: string
   heart_beat: number
   blood_oxygen: number
+  temperature: number
 }
 interface IMedication {
   name: string
@@ -134,6 +135,7 @@ const vitalSchema = new mongoose.Schema<IVital>(
     blood_pressure: { type: String },
     heart_beat: { type: Number },
     blood_oxygen: { type: Number },
+    temperature: { type: Number },
   },
   { timestamps: true }
 )

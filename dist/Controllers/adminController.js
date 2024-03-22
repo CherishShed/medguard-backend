@@ -104,38 +104,6 @@ const EmployeeController = {
                 gender: 1,
                 status: 1,
             });
-            allPatients.forEach(patient => {
-                const latestVitals = patient.latestVitals;
-                const bloodPressure = latestVitals.blood_pressure;
-                const [systolic, diastolic] = bloodPressure.split('/').map(Number);
-                if (systolic < 90 ||
-                    systolic > 140 ||
-                    diastolic < 60 ||
-                    diastolic > 90) {
-                    patient.status = 'bad';
-                }
-                else if (systolic < 120 || diastolic < 80) {
-                    patient.status = 'abnormal';
-                }
-                else {
-                    patient.status = 'good';
-                }
-                const heartRate = latestVitals.heart_beat;
-                if (heartRate < 60 || heartRate > 100) {
-                    patient.status = 'bad';
-                }
-                else if (heartRate < 70 || heartRate > 90) {
-                    if (patient.status != 'bad') {
-                        patient.status = 'abnormal';
-                    }
-                }
-                else {
-                    if (patient.status !== 'bad' && patient.status !== 'abnormal') {
-                        patient.status = 'good';
-                    }
-                }
-                patient.save();
-            });
             return res.status(200).json({ patients: allPatients, success: true });
         }
         catch (error) {
