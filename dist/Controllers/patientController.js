@@ -87,7 +87,7 @@ const patientController = {
                     status = 'abnormal';
                 }
                 if (latestHeart_beat < 50 ||
-                    latestHeart_beat > upperLimitHeartRate + 10) {
+                    latestHeart_beat > upperLimitHeartRate + 5) {
                     status = 'bad';
                 }
                 else if (latestHeart_beat < 60 ||
@@ -117,7 +117,7 @@ const patientController = {
                 const to = foundPatient.phone_number;
                 const text = `Dear ${foundPatient.firstName}, your Vitals do not look good please visit the hospital as soon as possible.\nTemperature: ${latestTemperature} degrees\nHeartbeat: ${latestHeart_beat}bpm\nBlood Oxygen: ${latestBlood_oxygen}%\n`;
                 const hospitalText = `Alert!!!\nThe Vitals of this patient do not look good.\nHospital Number: ${foundPatient.hospitalNumber}Name: ${foundPatient.firstName} ${foundPatient.lastName}.\n\nPhone Number: ${foundPatient.phone_number}\nTemperature: ${latestTemperature} degrees\nHeartbeat: ${latestHeart_beat}bpm\nBlood Oxygen: ${latestBlood_oxygen}%\n`;
-                if (status === 'bad') {
+                if (status != 'good') {
                     (0, helperFunctions_1.sendSMS)(to, text);
                     setTimeout(() => {
                         (0, helperFunctions_1.sendSMS)('2349167648722', hospitalText);
