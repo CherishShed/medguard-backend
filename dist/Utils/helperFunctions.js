@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendSMS = exports.medicationReminder = exports.updatePrescriptions = void 0;
+exports.calculateAge = exports.sendSMS = exports.medicationReminder = exports.updatePrescriptions = void 0;
 const axios_1 = __importDefault(require("axios"));
 const database_1 = require("../Model/database");
 require("dotenv/config");
@@ -112,3 +112,17 @@ function sendSMS(to, text) {
     });
 }
 exports.sendSMS = sendSMS;
+function calculateAge(dateOfBirth) {
+    const dobParts = dateOfBirth.split('-');
+    const dobYear = parseInt(dobParts[0]);
+    const dobMonth = parseInt(dobParts[1]);
+    const dobDay = parseInt(dobParts[2]);
+    const currentDate = new Date();
+    let age = currentDate.getFullYear() - dobYear;
+    if (currentDate.getMonth() < dobMonth - 1 ||
+        (currentDate.getMonth() === dobMonth - 1 && currentDate.getDate() < dobDay)) {
+        age--;
+    }
+    return age;
+}
+exports.calculateAge = calculateAge;

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { Patient, Prescription } from '../Model/database'
-import { sendSMS } from '../Utils/helperFunctions'
+import { calculateAge, sendSMS } from '../Utils/helperFunctions'
 
 const patientController = {
   getPatientInfo: async (req: Request, res: Response) => {
@@ -52,6 +52,7 @@ const patientController = {
           lastName: 1,
           status: 1,
           latestVitals: 1,
+          dateOfBirth: 1,
         }
       )
       const typedVitals = {
@@ -67,6 +68,8 @@ const patientController = {
         const latestHeart_beat = typedVitals.heart_beat
         const latestBlood_oxygen = typedVitals.blood_oxygen
         const latestTemperature = typedVitals.temperature
+        const patientAge = calculateAge(foundPatient.dateOfBirth)
+        const upperLimitHeartRate = 220 - patientAge
         const [systolic, diastolic] = (latestBlood_pressure as string)
           .split('/')
           .map(Number)
@@ -86,10 +89,16 @@ const patientController = {
           status = 'abnormal'
         }
         // Check heart rate
-        if (latestHeart_beat < 60 || latestHeart_beat > 100) {
+        if (
+          latestHeart_beat < 50 ||
+          latestHeart_beat > upperLimitHeartRate + 10
+        ) {
           // Abnormal heart rate
           status = 'bad'
-        } else if (latestHeart_beat < 70 || latestHeart_beat > 90) {
+        } else if (
+          latestHeart_beat < 60 ||
+          latestHeart_beat > upperLimitHeartRate
+        ) {
           // Warning for heart rate
           if (status !== 'bad') {
             status = 'abnormal'
@@ -116,7 +125,7 @@ const patientController = {
         const to = foundPatient.phone_number
         const text = `Dear ${foundPatient.firstName}, your Vitals do not look good please visit the hospital as soon as possible.\nTemperature: ${latestTemperature} degrees\nHeartbeat: ${latestHeart_beat}bpm\nBlood Oxygen: ${latestBlood_oxygen}%\n`
         const hospitalText = `Alert!!!\nThe Vitals of this patient do not look good.\nHospital Number: ${foundPatient.hospitalNumber}Name: ${foundPatient.firstName} ${foundPatient.lastName}.\n\nPhone Number: ${foundPatient.phone_number}\nTemperature: ${latestTemperature} degrees\nHeartbeat: ${latestHeart_beat}bpm\nBlood Oxygen: ${latestBlood_oxygen}%\n`
-        if (status != 'good') {
+        if (status === 'bad') {
           sendSMS(to, text)
           setTimeout(() => {
             sendSMS('2349167648722', hospitalText)

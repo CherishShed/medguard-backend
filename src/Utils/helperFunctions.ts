@@ -86,34 +86,6 @@ export const medicationReminder = async () => {
   })
 }
 
-// export function sendSMS(to: string, text: string) {
-//   console.log('trying to send')
-//   const url = 'https://my.kudisms.net/api/sms'
-//   const token = process.env.KUDI_SMS_TOKEN as string
-//   const senderID = process.env.KUDI_SMS_SENDER_ID as string
-//   const recipients = to
-//   const message = text
-//   const gateway = '2'
-
-//   const queryParams = new URLSearchParams({
-//     token,
-//     senderID,
-//     recipients,
-//     message,
-//     gateway,
-//   })
-
-//   axios
-//     .get(`${url}?${queryParams}`, { timeout: 40000, maxBodyLength: Infinity })
-//     .then(response => {
-//       console.log('Sent message sucesfully', response.data)
-//     })
-//     .catch(error => {
-//       console.log('An error occured while sending message\n', error.message)
-//     })
-//   return
-// }
-
 export function sendSMS(to: string, text: string) {
   const token = process.env.KUDI_SMS_TOKEN as string
   const senderID = process.env.KUDI_SMS_SENDER_ID as string
@@ -139,4 +111,28 @@ export function sendSMS(to: string, text: string) {
     .catch(function (error) {
       console.log(error)
     })
+}
+
+export function calculateAge(dateOfBirth: string) {
+  // Split the date string into year, month, and day components
+  const dobParts = dateOfBirth.split('-')
+  const dobYear = parseInt(dobParts[0])
+  const dobMonth = parseInt(dobParts[1])
+  const dobDay = parseInt(dobParts[2])
+
+  // Get the current date
+  const currentDate = new Date()
+
+  // Calculate the difference in years
+  let age = currentDate.getFullYear() - dobYear
+
+  // Check if the birthday has occurred yet this year
+  if (
+    currentDate.getMonth() < dobMonth - 1 ||
+    (currentDate.getMonth() === dobMonth - 1 && currentDate.getDate() < dobDay)
+  ) {
+    age--
+  }
+
+  return age
 }
