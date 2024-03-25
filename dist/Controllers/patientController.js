@@ -112,6 +112,11 @@ const patientController = {
                         status = 'abnormal';
                     }
                 }
+                if (latestBlood_oxygen == 0 &&
+                    latestHeart_beat == 0 &&
+                    latestTemperature == 0) {
+                    status = 'good';
+                }
                 foundPatient.status = status;
                 foundPatient.save();
                 const to = foundPatient.phone_number;
